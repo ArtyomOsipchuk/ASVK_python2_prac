@@ -5,7 +5,7 @@ pos = [0, 0]
 
 def encounter(y, x):
     name, message = dungeon[y][x]
-    print(cowsay.cowsay(message))
+    print(cowsay.cowsay(message, cow=name))
 
 while (c := input()):
     movement = True
