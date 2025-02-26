@@ -13,7 +13,6 @@ elif len(sys.argv) == 3:
     for head in Path(sys.argv[1]).glob(f".git/refs/heads/{sys.argv[2]}"):
         with open(head, "rb") as f:
             com = f.read().decode()
-            print("ищем", com)
     for store in Path(sys.argv[1]).glob(".git/objects/??/*"):
         #print("store", store)
         Id = basename(dirname(store)) + basename(store)
@@ -22,17 +21,23 @@ elif len(sys.argv) == 3:
                 obj = zlib.decompress(f.read())
                 header, _, body = obj.partition(b'\x00')
                 kind, size = header.split()
-                out = body.decode()
-                print(out)
-        """continue
-        print("Id", "kind.decode()", Id, kind.decode())
-        if kind == b'tree':
-            tail = body
-            while tail:
-                treeobj, _, tail = tail.partition(b'\x00')
-                tmode, tname = treeobj.split()
-                num, tail = tail[:20], tail[20:]
-                print(f"{SHIFT}{tname.decode()} {tmode.decode()} {num.hex()}")
-        elif kind == b'commit':
-            out = body.decode().replace('\n', '\n' + SHIFT)
-            print(f"{SHIFT}{out}")"""
+                tree = body.decode().split()[1]
+                print([tree])
+            break
+    for store in Path(sys.argv[1]).glob(".git/objects/??/*"):
+        Id = basename(dirname(store)) + basename(store)
+        if Id == tree:
+            with open(store, "rb") as f:
+                obj = zlib.decompress(f.read())
+                header, _, body = obj.partition(b'\x00')
+                kind, size = header.split()
+                out = body #.decode()
+                print(header, body)
+            if kind == b'tree':
+                tail = body
+                while tail:
+                    treeobj, _, tail = tail.partition(b'\x00')
+                    tmode, tname = treeobj.split()
+                    num, tail = tail[:20], tail[20:]
+                    print(f"blob {num.hex()}\t{tname.decode()}")
+            print(f"tree {Id}\t{sys.argv[2]}")
