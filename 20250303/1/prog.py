@@ -1,6 +1,7 @@
 import cowsay
 import sys
 from io import StringIO
+import shlex
 
 dungeon = [[0 for i in range(10)] for j in range(10)]
 pos = [0, 0]
@@ -23,8 +24,8 @@ def encounter(y, x):
 
 print("<<< Welcome to Python-MUD 0.1 >>>")
 while (c := sys.stdin.readline()):
+    c = shlex.split(c)
     movement = True
-    c = str(c).split()
     match c:
         case ["up"]:
             pos[1] = (pos[1] + 1) % 10
