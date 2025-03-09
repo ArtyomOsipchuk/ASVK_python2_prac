@@ -16,7 +16,7 @@ def encounter(y, x):
         '-._/``  ``\\_.-'
   jgs     __\\ \b\\'--'//__
          (((""`  `"")))"""))
-    name, message = dungeon[y][x]
+    hp, name, message = dungeon[y][x]
     if name == "jgsbat":
         print(cowsay.cowsay(message, cowfile=jgsbat))
     else:
@@ -39,16 +39,32 @@ while (c := sys.stdin.readline()):
         case ["left"]:
             pos[0] = (pos[0] - 1) % 10
             print(f"Moved to ({pos[0]}, {pos[1]})") 
-        case ["addmon", x, y, name, hello]:
+        case ["addmon", name, *pars]:
+            err_parse = True
             movement = False
-            if x.isdigit() and y.isdigit() and name in cowsay.list_cows() + ["jgsbat"]:
-              y, x = int(y), int(x)
-              print(f"Added monster {name} to ({x}, {y}) saying {hello}")
-              if dungeon[y][x]:
-                  print("Replaced the old monster")
-              dungeon[y][x] = [name, hello]
-            else:
-              print("Invalid arguments")
+            if len(pars) == 7:
+                i = pars.index("coords")
+                if -1 < i < 5:
+                    x, y = pars[i + 1], pars[i + 2]
+                    if x.isdigit() and y.isdigit():
+                        y, x = int(y), int(x)
+                        i = pars.index("hp")
+                        if -1 < i < 6:
+                            hp = pars[i + 1]
+                            if hp.isdigit():
+                                hp = int(hp)
+                                if hp > 0:
+                                    i = pars.index("hello")
+                                    if -1 < i < 6:
+                                        hello = pars[i + 1]
+                                        if name in cowsay.list_cows() + ["jgsbat"]:
+                                            err_parse = False
+                                            print(f"Added monster {name} to ({x}, {y}) saying {hello}")
+                                            if dungeon[y][x]:
+                                                print("Replaced the old monster")
+                                            dungeon[y][x] = [hp, name, hello]
+            if err_parse:
+                print("Invalid arguments")
         case _:
             movement = False
             print("Invalid command")
