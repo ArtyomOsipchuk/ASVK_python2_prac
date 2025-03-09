@@ -1,13 +1,27 @@
 import cowsay
+import sys
+from io import StringIO
 
 dungeon = [[0 for i in range(10)] for j in range(10)]
 pos = [0, 0]
 
 def encounter(y, x):
+    jgsbat = cowsay.read_dot_cow(StringIO("""    ,_                    _,
+    ) '-._  ,_    _,  _.-' (
+    )  _.-'.|\\ \b\\--//|.'-._  (
+     )'   .'\\/o\\/o\\/'.   `(
+      ) .' . \\====/ . '. (
+       )  / <<    >> \\  (
+        '-._/``  ``\\_.-'
+  jgs     __\\ \b\\'--'//__
+         (((""`  `"")))"""))
     name, message = dungeon[y][x]
-    print(cowsay.cowsay(message, cow=name))
+    if name == "jgsbat":
+        print(cowsay.cowsay(message, cowfile=jgsbat))
+    else:
+        print(cowsay.cowsay(message, cow=name))
 
-while (c := input()):
+while (c := sys.stdin.readline()):
     movement = True
     c = str(c).split()
     match c:
@@ -25,7 +39,7 @@ while (c := input()):
             print(f"Moved to ({pos[0]}, {pos[1]})") 
         case ["addmon", x, y, name, hello]:
             movement = False
-            if x.isdigit() and y.isdigit() and name in cowsay.list_cows():
+            if x.isdigit() and y.isdigit() and name in cowsay.list_cows() + ["jgsbat"]:
               y, x = int(y), int(x)
               print(f"Added monster {name} to ({x}, {y}) saying {hello}")
               if dungeon[y][x]:
