@@ -21,6 +21,7 @@ def encounter(y, x):
     else:
         print(cowsay.cowsay(message, cow=name))
 
+print("<<< Welcome to Python-MUD 0.1 >>>")
 while (c := sys.stdin.readline()):
     movement = True
     c = str(c).split()
