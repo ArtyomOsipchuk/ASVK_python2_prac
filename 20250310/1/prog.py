@@ -62,16 +62,34 @@ class MUD(cmd.Cmd):
             print(f"Moved to ...")
             encounter(pos[1], pos[0])
 
-    def do_attack(self, arg):
+    def do_attack(self, weapon=0):
         '''attack - deals 10 damage'''
+        ww = 'sword'
         damage = 10
+        weapons = ['sword', 'spear', 'axe']
+        if weapon:
+            weapon = weapon.split()
+            if weapon[0] == 'with':
+                if weapon[1] in weapons:
+                    ww = weapon
+                else:
+                    print("Unknown weapon")
+                    return
+            else:
+                print("Invalid command")
+                return
+        if ww == 'spear':
+            damage = 15
+        elif ww == 'axe':
+            damage = 20
         pos = self.pos
         if not dungeon[pos[1]][pos[0]]:
             print(f"No monsters here")
         else:
             hp, name, _ = dungeon[pos[1]][pos[0]]
             print(f"Attacked {name},  damage {damage} hp")
-            dungeon[pos[1]][pos[0]][0] = max(hp - damage, 0)
+            hp = max(hp - damage, 0)
+            dungeon[pos[1]][pos[0]][0] = hp
             if hp:
                 print(name,"now has", hp)
             else:
@@ -110,6 +128,16 @@ class MUD(cmd.Cmd):
 
     def do_EOF(self, arg):
         return 1
+
+    def complete_attack(self, text, line, begidx, endidx):
+        words = (line[:endidx] + ".").split()
+        DICT = []
+        #print(words)
+        if len(words) == 2:
+            DICT = ['with']
+        if len(words) == 3 and 'with' in words:
+            DICT = ["sword", "spear", "axe"]
+        return [c for c in DICT if c.startswith(text)]
 
     def complete_addmon(self, text, line, begidx, endidx):
         words = (line[:endidx] + ".").split()
