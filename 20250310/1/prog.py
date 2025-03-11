@@ -1,5 +1,4 @@
 import cowsay
-import sys
 import cmd
 from io import StringIO
 import shlex
@@ -63,8 +62,24 @@ class MUD(cmd.Cmd):
             print(f"Moved to ...")
             encounter(pos[1], pos[0])
 
+    def do_attack(self, arg):
+        '''attack - deals 10 damage'''
+        damage = 10
+        pos = self.pos
+        if not dungeon[pos[1]][pos[0]]:
+            print(f"No monsters here")
+        else:
+            hp, name, _ = dungeon[pos[1]][pos[0]]
+            print(f"Attacked {name},  damage {damage} hp")
+            dungeon[pos[1]][pos[0]][0] = max(hp - damage, 0)
+            if hp:
+                print(name,"now has", hp)
+            else:
+                print(name, "died")
+                dungeon[pos[1]][pos[0]] = 0
+
     def do_addmon(self, arg):
-        '''addmon <>'''
+        '''addmon <monster_name> hello <hello_string> hp <hitpoints> coords <x> <y>'''
         err_parse = True
         print(arg)
         name, *pars = shlex.split(arg)
