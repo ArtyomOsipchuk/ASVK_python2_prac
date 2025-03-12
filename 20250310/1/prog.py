@@ -63,11 +63,14 @@ class MUD(cmd.Cmd):
             encounter(pos[1], pos[0])
 
     def do_attack(self, arg):
-        '''attack - deals 10 damage'''
+        '''attack <имя монстра>'''
         damage = 10
         pos = self.pos
-        if not dungeon[pos[1]][pos[0]]:
-            print(f"No monsters here")
+        if len(arg.split()) != 1:
+            print("Invalid arguments")
+            return
+        if not dungeon[pos[1]][pos[0]] or dungeon[pos[1]][pos[0]][1] != arg:
+            print(f"No", arg, "here")
         else:
             hp, name, _ = dungeon[pos[1]][pos[0]]
             print(f"Attacked {name},  damage {damage} hp")
@@ -126,6 +129,14 @@ class MUD(cmd.Cmd):
         if len(words) == 2:
             DICT.extend(["jgsbat"] + cowsay.list_cows())
         return [c for c in DICT if c.startswith(text)]
+    
+    def complete_attack(self, text, line, begidx, endidx):
+        words = (line[:endidx] + ".").split()
+        DICT = []
+        if len(words) == 2:
+            DICT.extend(["jgsbat"] + cowsay.list_cows())
+        return [c for c in DICT if c.startswith(text)]
+
 
 if __name__ == '__main__':
     MUD().cmdloop()
