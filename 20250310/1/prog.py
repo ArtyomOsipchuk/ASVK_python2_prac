@@ -2,6 +2,7 @@ import cowsay
 import cmd
 from io import StringIO
 import shlex
+import readline
 
 dungeon = [[0 for i in range(10)] for j in range(10)]
 
@@ -132,9 +133,9 @@ class MUD(cmd.Cmd):
     
     def complete_attack(self, text, line, begidx, endidx):
         words = (line[:endidx] + ".").split()
-        DICT = []
-        if len(words) == 2:
-            DICT.extend(["jgsbat"] + cowsay.list_cows())
+        DICT = ["jgsbat"] + cowsay.list_cows()
+        if len(words) == 2 and words[-1][:-1] in DICT:
+            return [DICT[(DICT.index(words[-1][:-1]) + 1) % len(DICT)]]
         return [c for c in DICT if c.startswith(text)]
 
 
