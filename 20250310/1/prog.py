@@ -2,6 +2,7 @@ import cowsay
 import cmd
 from io import StringIO
 import shlex
+import readline
 
 dungeon = [[0 for i in range(10)] for j in range(10)]
 
@@ -62,32 +63,36 @@ class MUD(cmd.Cmd):
             print(f"Moved to ...")
             encounter(pos[1], pos[0])
 
-    def do_attack(self, weapon=0):
-        '''attack - deals 10 damage'''
-        ww = 'sword'
-        damage = 10
-        weapons = ['sword', 'spear', 'axe']
-        if weapon:
-            weapon = weapon.split()
-            if weapon[0] == 'with':
-                if weapon[1] in weapons:
-                    ww = weapon
-                else:
-                    print("Unknown weapon")
-                    return
+    def do_attack(self, arg):
+        '''attack <имя монстра> with <имя оружия>'''
+        arg = arg.split()
+        if len(arg) < 1 or len(arg) == 2:
+            print("Invalid arguments")
+            return
+        name = arg[0]
+        if len(arg) > 1 and arg[1] != 'with':
+            print("Invalid arguments")
+            return
+        if len(arg) == 1:
+            ww = 'sword'
+            damage = 10
+        else:
+            weapons = ['sword', 'spear', 'axe']
+            if arg[2] in weapons:
+                ww = arg[2]
             else:
-                print("Invalid command")
+                print("Unknown weapon")
                 return
         if ww == 'spear':
             damage = 15
         elif ww == 'axe':
             damage = 20
         pos = self.pos
-        if not dungeon[pos[1]][pos[0]]:
-            print(f"No monsters here")
+        if not dungeon[pos[1]][pos[0]] or dungeon[pos[1]][pos[0]][1] != name:
+            print(f"No", name, "here")
         else:
             hp, name, _ = dungeon[pos[1]][pos[0]]
-            print(f"Attacked {name},  damage {damage} hp")
+            print(f"Attacked {name}, damage {damage} hp")
             hp = max(hp - damage, 0)
             dungeon[pos[1]][pos[0]][0] = hp
             if hp:
@@ -99,7 +104,6 @@ class MUD(cmd.Cmd):
     def do_addmon(self, arg):
         '''addmon <monster_name> hello <hello_string> hp <hitpoints> coords <x> <y>'''
         err_parse = True
-        print(arg)
         name, *pars = shlex.split(arg)
         if len(pars) == 7:
             i = pars.index("hello")
@@ -127,16 +131,24 @@ class MUD(cmd.Cmd):
                 print("Invalid arguments")
 
     def do_EOF(self, arg):
+        '''End Of File AKA exit game'''
         return 1
 
     def complete_attack(self, text, line, begidx, endidx):
         words = (line[:endidx] + ".").split()
         DICT = []
-        #print(words)
-        if len(words) == 2:
+        cows = ["jgsbat"] + cowsay.list_cows()
+        weapons = ["sword", "spear", "axe"]
+        if len(words) == 2 and words[-1][:-1] in cows:
+            return [cows[(cows.index(words[-1][:-1]) + 1) % len(cows)]]
+        elif len(words) == 2:
+            DICT = cows
+        elif len(words) == 3:
             DICT = ['with']
-        if len(words) == 3 and 'with' in words:
-            DICT = ["sword", "spear", "axe"]
+        elif len(words) == 4 and words[-1][:-1] in weapons:
+            return [weapons[(weapons.index(words[-1][:-1]) + 1) % len(weapons)]]
+        elif len(words) == 4 and 'with' in words:
+            DICT = weapons
         return [c for c in DICT if c.startswith(text)]
 
     def complete_addmon(self, text, line, begidx, endidx):
