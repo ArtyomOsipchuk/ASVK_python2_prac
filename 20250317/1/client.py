@@ -83,6 +83,43 @@ class MUDClient(cmd.Cmd):
             ans = ans.split()
             self.encounter(ans[0], ans[1], pos[1], pos[0])
 
+    def do_attack(self, arg):
+        '''attack <имя монстра> with <имя оружия>'''
+        arg = arg.split()
+        if len(arg) < 1 or len(arg) == 2:
+            print("Invalid arguments")
+            return
+        name = arg[0]
+        if len(arg) > 1 and arg[1] != 'with':
+            print("Invalid arguments")
+            return
+        if len(arg) == 1:
+            ww = 'sword'
+            damage = 10
+        else:
+            weapons = ['sword', 'spear', 'axe']
+            if arg[2] in weapons:
+                ww = arg[2]
+            else:
+                print("Unknown weapon")
+                return
+        if ww == 'spear':
+            damage = 15
+        elif ww == 'axe':
+            damage = 20
+        msg = f"attack {name} {damage}\n"
+        s.sendall(bytes(msg.encode()))
+        ans = s.recv(1024).rstrip().decode()
+        if ans == 'nobody':    
+            print(f"No", name, "here")
+        else:
+            damage, new_hp = map(int, ans.split()) 
+            print(f"Attacked {name}, damage {damage} hp")
+            if new_hp:
+                print(name,"now has", new_hp)
+            else:
+                print(name, "died")
+
     def do_addmon(self, arg):
         '''addmon <monster_name> hello <hello_string> hp <hitpoints> coords <x> <y>'''
         err_parse = True
