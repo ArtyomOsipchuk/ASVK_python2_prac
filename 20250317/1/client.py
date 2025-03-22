@@ -41,8 +41,8 @@ class MUDClient(cmd.Cmd):
         ans = s.recv(1024).rstrip().decode()
         if ans != 'nobody':
             print(f"Moved to ...")
-            ans = ans.split()
-            self.encounter(ans[0], ans[1], pos[1], pos[0])
+            name, *message = ans.split()
+            self.encounter(name, ' '.join(message), pos[1], pos[0])
 
     def do_down(self, arg):
         '''moves character down'''
@@ -54,8 +54,8 @@ class MUDClient(cmd.Cmd):
         ans = s.recv(1024).rstrip().decode()
         if ans != 'nobody':
             print(f"Moved to ...")
-            ans = ans.split()
-            self.encounter(ans[0], ans[1], pos[1], pos[0])
+            name, *message = ans.split()
+            self.encounter(name, ' '.join(message), pos[1], pos[0])
 
     def do_left(self, arg):
         '''moves character left'''
@@ -67,8 +67,8 @@ class MUDClient(cmd.Cmd):
         ans = s.recv(1024).rstrip().decode()
         if ans != 'nobody':
             print(f"Moved to ...")
-            ans = ans.split()
-            self.encounter(ans[0], ans[1], pos[1], pos[0])
+            name, *message = ans.split()
+            self.encounter(name, ' '.join(message), pos[1], pos[0])
 
     def do_right(self, arg):
         '''moves character right'''
@@ -80,8 +80,8 @@ class MUDClient(cmd.Cmd):
         ans = s.recv(1024).rstrip().decode()
         if ans != 'nobody':
             print(f"Moved to ...")
-            ans = ans.split()
-            self.encounter(ans[0], ans[1], pos[1], pos[0])
+            name, *message = ans.split()
+            self.encounter(name, ' '.join(message), pos[1], pos[0])
 
     def do_attack(self, arg):
         '''attack <имя монстра> with <имя оружия>'''
