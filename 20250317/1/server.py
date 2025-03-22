@@ -27,6 +27,26 @@ class MUDServer:
                 data = f"{self.pos[0]} {self.pos[1]}"
                 print('>> ', data)
                 writer.write(bytes(data.encode()))
+            elif data.startswith("attack "):
+                data = data.split()
+                name, damage = data[1], int(data[2])
+                if not self.dungeon[self.pos[1]][self.pos[0]]:
+                    data = 'nobody'
+                else:
+                    hp, m_name, msg = self.dungeon[self.pos[1]][self.pos[0]]
+                    hp, damage = int(hp), int(damage)
+                    if name == m_name:
+                        new_hp = max(hp - damage, 0)
+                        data = f"{min(damage, hp)} {new_hp}"
+                        pos = self.pos
+                        if new_hp:
+                            self.dungeon[pos[1]][pos[0]] = new_hp, m_name, msg
+                        else:
+                            self.dungeon[pos[1]][pos[0]] = 0
+                    else:
+                        data = 'nobody'
+                print('>> ', data)
+                writer.write(bytes(data.encode()))
             elif data.startswith("add "):
                 add, name, hp, y, x, *message = data.split()
                 replaced = 0
