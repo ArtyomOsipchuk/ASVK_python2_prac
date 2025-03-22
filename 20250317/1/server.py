@@ -27,6 +27,16 @@ class MUDServer:
                 data = f"{self.pos[0]} {self.pos[1]}"
                 print('>> ', data)
                 writer.write(bytes(data.encode()))
+            elif data.startswith("add "):
+                add, name, hp, y, x, *message = data.split()
+                replaced = 0
+                y, x, hp = map(int, [y, x, hp])
+                if self.dungeon[y][x]:
+                    replaced = 1
+                self.dungeon[y][x] = hp, name, " ".join(message)
+                data = f"{replaced}"
+                print('>> ', data)
+                writer.write(bytes(data.encode()))
             else:
                 print('>WARNING< Wrong command ignored', data)
         print("Player disconnected")
