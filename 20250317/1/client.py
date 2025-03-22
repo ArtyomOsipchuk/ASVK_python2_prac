@@ -83,6 +83,40 @@ class MUDClient(cmd.Cmd):
             ans = ans.split()
             self.encounter(ans[0], ans[1], pos[1], pos[0])
 
+    def do_addmon(self, arg):
+        '''addmon <monster_name> hello <hello_string> hp <hitpoints> coords <x> <y>'''
+        err_parse = True
+        if len(arg.split()) < 2:
+            print("Invalid arguments")
+            return
+        name, *pars = shlex.split(arg)
+        if len(pars) == 7:
+            i = pars.index("hello")
+            if -1 < i < 6:
+                hello = pars[i + 1]
+                pars[i + 1] = "-"
+                i = pars.index("hp")
+                if -1 < i < 6:
+                    hp = pars[i + 1]
+                    if hp.isdigit():
+                        hp = int(hp)
+                        if hp > 0:
+                            i = pars.index("coords")
+                            if -1 < i < 5:
+                                x, y = pars[i + 1], pars[i + 2]
+                                if x.isdigit() and y.isdigit():                    
+                                    y, x = int(y), int(x)
+                                    if name in cowsay.list_cows() + ["jgsbat"]:
+                                        err_parse = False
+                                        print(f"Added monster {name} to ({x}, {y}) saying {hello}")
+                                        msg = f"add {name} {hp} {y} {x} {hello}\n"
+                                        s.sendall(bytes(msg.encode()))
+                                        ans = s.recv(1024).rstrip().decode()
+                                        if int(ans):
+                                            print("Replaced the old monster")
+        if err_parse:
+                print("Invalid arguments")
+
     def do_EOF(self, arg):
         '''End Of File AKA exit game'''
         return 1
