@@ -1,0 +1,71 @@
+From 0b0d0142a912cb708fe7a7492071bdddec4efb21 Mon Sep 17 00:00:00 2001
+From: ArtyomOsipchuk <artos4002@yandex.ru>
+Date: Sat, 22 Mar 2025 17:52:47 +0300
+Subject: [PATCH 4/4] =?UTF-8?q?=D0=98=D1=81=D0=BF=D1=80=D0=B0=D0=B2=D0=BB?=
+ =?UTF-8?q?=D0=B5=D0=BD=D0=B0=20=D0=BE=D1=88=D0=B8=D0=B1=D0=BA=D0=B0,=20?=
+ =?UTF-8?q?=D0=BA=D0=BE=D0=B3=D0=B4=D0=B0=20=D0=B2=D1=8B=D1=81=D0=B2=D0=B5?=
+ =?UTF-8?q?=D1=87=D0=B8=D0=B2=D0=B0=D0=BB=D0=BE=D1=81=D1=8C=20=D0=BD=D0=B5?=
+ =?UTF-8?q?=20=D0=B2=D1=81=D1=91=20=D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5?=
+ =?UTF-8?q?=D0=BD=D0=B8=D0=B5=20-=D0=BC=D0=B5=D1=82=D0=BE=D0=B4=D1=83=20en?=
+ =?UTF-8?q?counter=20=D0=BF=D0=B5=D1=80=D0=B5=D0=B4=D0=B0=D0=B2=D0=B0?=
+ =?UTF-8?q?=D0=BB=D1=81=D1=8F=20=D0=BD=D0=B5=20=D0=B2=D0=B5=D1=81=D1=8C=20?=
+ =?UTF-8?q?=D1=82=D0=B5=D0=BA=D1=81=D1=82?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ 20250317/1/client.py | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/20250317/1/client.py b/20250317/1/client.py
+index 1c512f9..ac1cfbc 100644
+--- a/20250317/1/client.py
++++ b/20250317/1/client.py
+@@ -41,8 +41,8 @@ class MUDClient(cmd.Cmd):
+         ans = s.recv(1024).rstrip().decode()
+         if ans != 'nobody':
+             print(f"Moved to ...")
+-            ans = ans.split()
+-            self.encounter(ans[0], ans[1], pos[1], pos[0])
++            name, *message = ans.split()
++            self.encounter(name, ' '.join(message), pos[1], pos[0])
+ 
+     def do_down(self, arg):
+         '''moves character down'''
+@@ -54,8 +54,8 @@ class MUDClient(cmd.Cmd):
+         ans = s.recv(1024).rstrip().decode()
+         if ans != 'nobody':
+             print(f"Moved to ...")
+-            ans = ans.split()
+-            self.encounter(ans[0], ans[1], pos[1], pos[0])
++            name, *message = ans.split()
++            self.encounter(name, ' '.join(message), pos[1], pos[0])
+ 
+     def do_left(self, arg):
+         '''moves character left'''
+@@ -67,8 +67,8 @@ class MUDClient(cmd.Cmd):
+         ans = s.recv(1024).rstrip().decode()
+         if ans != 'nobody':
+             print(f"Moved to ...")
+-            ans = ans.split()
+-            self.encounter(ans[0], ans[1], pos[1], pos[0])
++            name, *message = ans.split()
++            self.encounter(name, ' '.join(message), pos[1], pos[0])
+ 
+     def do_right(self, arg):
+         '''moves character right'''
+@@ -80,8 +80,8 @@ class MUDClient(cmd.Cmd):
+         ans = s.recv(1024).rstrip().decode()
+         if ans != 'nobody':
+             print(f"Moved to ...")
+-            ans = ans.split()
+-            self.encounter(ans[0], ans[1], pos[1], pos[0])
++            name, *message = ans.split()
++            self.encounter(name, ' '.join(message), pos[1], pos[0])
+ 
+     def do_attack(self, arg):
+         '''attack <имя монстра> with <имя оружия>'''
+-- 
+2.42.4
+

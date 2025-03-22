@@ -1,0 +1,93 @@
+From 2f52b5e5df8b2a1fe1d02bca4db8eadccf6fcf73 Mon Sep 17 00:00:00 2001
+From: ArtyomOsipchuk <artos4002@yandex.ru>
+Date: Sat, 22 Mar 2025 17:44:56 +0300
+Subject: [PATCH 2/4] =?UTF-8?q?=D0=94=D0=BE=D0=B1=D0=B0=D0=B2=D0=BB=D0=B5?=
+ =?UTF-8?q?=D0=BD=D0=B0=20=D0=BE=D0=B1=D1=80=D0=B0=D0=B1=D0=BE=D1=82=D0=BA?=
+ =?UTF-8?q?=D0=B0=20=D0=BF=D1=80=D0=BE=D1=82=D0=BE=D0=BA=D0=BE=D0=BB=D0=B0?=
+ =?UTF-8?q?=20=D0=B4=D0=BE=D0=B1=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD=D0=B8=D1=8F?=
+ =?UTF-8?q?=20=D0=BC=D0=BE=D0=BD=D1=81=D1=82=D1=80=D0=B0=20-=D0=9A=D0=BB?=
+ =?UTF-8?q?=D0=B8=D0=B5=D0=BD=D1=82=20=D0=B7=D0=B0=D0=BD=D0=B8=D0=BC=D0=B0?=
+ =?UTF-8?q?=D0=B5=D1=82=D1=81=D1=8F=20=D0=BE=D0=B1=D1=80=D0=B0=D0=B1=D0=BE?=
+ =?UTF-8?q?=D1=82=D0=BA=D0=BE=D0=B9=20=D0=BA=D0=BE=D0=BC=D0=B0=D0=BD=D0=B4?=
+ =?UTF-8?q?=D1=8B=20-=D0=A1=D0=B5=D1=80=D0=B2=D0=B5=D1=80=20=D0=B7=D0=B0?=
+ =?UTF-8?q?=D0=BD=D0=B8=D0=BC=D0=B0=D0=B5=D1=82=D1=81=D1=8F=20=D0=BC=D0=B5?=
+ =?UTF-8?q?=D0=BD=D0=B5=D0=B4=D0=B6=D0=BC=D0=B5=D0=BD=D1=82=D0=BE=D0=BC=20?=
+ =?UTF-8?q?=D0=BF=D0=BE=D0=B4=D0=B7=D0=B5=D0=BC=D0=B5=D0=BB=D1=8C=D1=8F?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ 20250317/1/client.py | 34 ++++++++++++++++++++++++++++++++++
+ 20250317/1/server.py | 10 ++++++++++
+ 2 files changed, 44 insertions(+)
+
+diff --git a/20250317/1/client.py b/20250317/1/client.py
+index d79c8e5..b092671 100644
+--- a/20250317/1/client.py
++++ b/20250317/1/client.py
+@@ -83,6 +83,40 @@ class MUDClient(cmd.Cmd):
+             ans = ans.split()
+             self.encounter(ans[0], ans[1], pos[1], pos[0])
+ 
++    def do_addmon(self, arg):
++        '''addmon <monster_name> hello <hello_string> hp <hitpoints> coords <x> <y>'''
++        err_parse = True
++        if len(arg.split()) < 2:
++            print("Invalid arguments")
++            return
++        name, *pars = shlex.split(arg)
++        if len(pars) == 7:
++            i = pars.index("hello")
++            if -1 < i < 6:
++                hello = pars[i + 1]
++                pars[i + 1] = "-"
++                i = pars.index("hp")
++                if -1 < i < 6:
++                    hp = pars[i + 1]
++                    if hp.isdigit():
++                        hp = int(hp)
++                        if hp > 0:
++                            i = pars.index("coords")
++                            if -1 < i < 5:
++                                x, y = pars[i + 1], pars[i + 2]
++                                if x.isdigit() and y.isdigit():                    
++                                    y, x = int(y), int(x)
++                                    if name in cowsay.list_cows() + ["jgsbat"]:
++                                        err_parse = False
++                                        print(f"Added monster {name} to ({x}, {y}) saying {hello}")
++                                        msg = f"add {name} {hp} {y} {x} {hello}\n"
++                                        s.sendall(bytes(msg.encode()))
++                                        ans = s.recv(1024).rstrip().decode()
++                                        if int(ans):
++                                            print("Replaced the old monster")
++        if err_parse:
++                print("Invalid arguments")
++
+     def do_EOF(self, arg):
+         '''End Of File AKA exit game'''
+         return 1
+diff --git a/20250317/1/server.py b/20250317/1/server.py
+index 26002cf..b6b72b7 100644
+--- a/20250317/1/server.py
++++ b/20250317/1/server.py
+@@ -27,6 +27,16 @@ class MUDServer:
+                 data = f"{self.pos[0]} {self.pos[1]}"
+                 print('>> ', data)
+                 writer.write(bytes(data.encode()))
++            elif data.startswith("add "):
++                add, name, hp, y, x, *message = data.split()
++                replaced = 0
++                y, x, hp = map(int, [y, x, hp])
++                if self.dungeon[y][x]:
++                    replaced = 1
++                self.dungeon[y][x] = hp, name, " ".join(message)
++                data = f"{replaced}"
++                print('>> ', data)
++                writer.write(bytes(data.encode()))
+             else:
+                 print('>WARNING< Wrong command ignored', data)
+         print("Player disconnected")
+-- 
+2.42.4
+

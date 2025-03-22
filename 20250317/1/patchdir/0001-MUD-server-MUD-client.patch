@@ -1,0 +1,256 @@
+From 5db58201ea8204045612bdaa39e970edd0724a99 Mon Sep 17 00:00:00 2001
+From: ArtyomOsipchuk <artos4002@yandex.ru>
+Date: Sat, 22 Mar 2025 17:34:36 +0300
+Subject: [PATCH 1/4] =?UTF-8?q?=D0=A1=D0=BE=D0=B7=D0=B4=D0=B0=D0=BD=D0=B8?=
+ =?UTF-8?q?=D0=B5=20MUD=20server=20=D0=B8=20MUD=20client=20-=D0=B4=D0=BE?=
+ =?UTF-8?q?=D0=B1=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD=20=D0=BF=D1=80=D0=BE=D1=82?=
+ =?UTF-8?q?=D0=BE=D0=BA=D0=BE=D0=BB=20move=20<x>=20<y>=20=D0=B4=D0=BB?=
+ =?UTF-8?q?=D1=8F=20=D0=BE=D0=B1=D0=BC=D0=B5=D0=BD=D0=B0=20=D0=BF=D0=B5?=
+ =?UTF-8?q?=D1=80=D0=B5=D0=BC=D0=B5=D1=89=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC=20?=
+ =?UTF-8?q?-=D0=B4=D0=BE=D0=B1=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD=20=D0=BF?=
+ =?UTF-8?q?=D1=80=D0=BE=D1=82=D0=BE=D0=BA=D0=BE=D0=BB=20pos=20=D0=B4=D0=BB?=
+ =?UTF-8?q?=D1=8F=20=D0=B7=D0=B0=D0=BF=D1=80=D0=BE=D1=81=D0=B0=20=D0=BF?=
+ =?UTF-8?q?=D0=BE=D0=B7=D0=B8=D1=86=D0=B8=D0=B8=20=D0=BA=D0=BB=D0=B8=D0=B5?=
+ =?UTF-8?q?=D0=BD=D1=82=D0=BE=D0=BC?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ 20250317/1/Pipfile      |   2 +-
+ 20250317/1/Pipfile.lock |   9 ++-
+ 20250317/1/client.py    | 128 ++++++++++++++++++++++++++++++++++++++++
+ 20250317/1/server.py    |  42 +++++++++++++
+ 4 files changed, 175 insertions(+), 6 deletions(-)
+ create mode 100644 20250317/1/client.py
+ create mode 100644 20250317/1/server.py
+
+diff --git a/20250317/1/Pipfile b/20250317/1/Pipfile
+index a1048cb..74e36ac 100644
+--- a/20250317/1/Pipfile
++++ b/20250317/1/Pipfile
+@@ -4,7 +4,7 @@ verify_ssl = true
+ name = "pypi"
+ 
+ [packages]
+-python-cowsay = "*"
++cowsay = "*"
+ 
+ [dev-packages]
+ 
+diff --git a/20250317/1/Pipfile.lock b/20250317/1/Pipfile.lock
+index 0c4a005..ec0d53a 100644
+--- a/20250317/1/Pipfile.lock
++++ b/20250317/1/Pipfile.lock
+@@ -1,7 +1,7 @@
+ {
+     "_meta": {
+         "hash": {
+-            "sha256": "56b6ab98d232dc88a63b3abd2ef3302f8cd9edb6d8dce111a2e2a14a1cd47b30"
++            "sha256": "9f7b6db61ca519ee45616dceb388cf4af787acc4fce1f128738b9e2d4d4942bc"
+         },
+         "pipfile-spec": 6,
+         "requires": {
+@@ -16,14 +16,13 @@
+         ]
+     },
+     "default": {
+-        "python-cowsay": {
++        "cowsay": {
+             "hashes": [
+-                "sha256:69aa91072e36ff27ceb8261718323c9ab275b3470b2260841c5b9ad5d83e8ff3",
+-                "sha256:eae49ea3abc00dba38f166e92f2e8f103a75182a944eb7b79aab5b515ca0363d"
++                "sha256:274b1e6fc1b966d53976333eb90ac94cb07a450a700b455af9fbdf882244b30a"
+             ],
+             "index": "pypi",
+             "markers": "python_version >= '3.8'",
+-            "version": "==1.2.0"
++            "version": "==6.1"
+         }
+     },
+     "develop": {}
+diff --git a/20250317/1/client.py b/20250317/1/client.py
+new file mode 100644
+index 0000000..d79c8e5
+--- /dev/null
++++ b/20250317/1/client.py
+@@ -0,0 +1,128 @@
++import sys
++import socket
++import cowsay
++import cmd
++from io import StringIO
++import shlex
++import readline
++
++class MUDClient(cmd.Cmd):
++    print("<<< Welcome to Python-MUD 0.1 >>>")
++    prompt = ">>> "
++
++    def _pos(self):
++        msg = f"pos\n"
++        s.sendall(bytes(msg.encode()))
++        ans = s.recv(1024).rstrip().decode()
++        return [int(i) for i in ans.split()]
++    
++    def encounter(self, name, message, y, x):
++        jgsbat = cowsay.read_dot_cow(StringIO("""    ,_                    _,
++    ) '-._  ,_    _,  _.-' (
++    )  _.-'.|\\ \b\\--//|.'-._  (
++     )'   .'\\/o\\/o\\/'.   `(
++      ) .' . \\====/ . '. (
++       )  / <<    >> \\  (
++        '-._/``  ``\\_.-'
++  jgs     __\\ \b\\'--'//__
++         (((""`  `"")))"""))
++        if name == "jgsbat":
++            print(cowsay.cowsay(message, cowfile=jgsbat))
++        else:
++            print(cowsay.cowsay(message, cow=name))
++
++    def do_up(self, arg):
++        '''moves character up'''
++        pos = self._pos()
++        pos[1] = (pos[1] + 1) % 10
++        print(f"Moved to ({pos[0]}, {pos[1]})")
++        msg = f"move {pos[0]} {pos[1]}\n"
++        s.sendall(bytes(msg.encode()))
++        ans = s.recv(1024).rstrip().decode()
++        if ans != 'nobody':
++            print(f"Moved to ...")
++            ans = ans.split()
++            self.encounter(ans[0], ans[1], pos[1], pos[0])
++
++    def do_down(self, arg):
++        '''moves character down'''
++        pos = self._pos()
++        pos[1] = (pos[1] - 1) % 10
++        print(f"Moved to ({pos[0]}, {pos[1]})")
++        msg = f"move {pos[0]} {pos[1]}\n"
++        s.sendall(bytes(msg.encode()))
++        ans = s.recv(1024).rstrip().decode()
++        if ans != 'nobody':
++            print(f"Moved to ...")
++            ans = ans.split()
++            self.encounter(ans[0], ans[1], pos[1], pos[0])
++
++    def do_left(self, arg):
++        '''moves character left'''
++        pos = self._pos()
++        pos[0] = (pos[0] - 1) % 10
++        print(f"Moved to ({pos[0]}, {pos[1]})")
++        msg = f"move {pos[0]} {pos[1]}\n"
++        s.sendall(bytes(msg.encode()))
++        ans = s.recv(1024).rstrip().decode()
++        if ans != 'nobody':
++            print(f"Moved to ...")
++            ans = ans.split()
++            self.encounter(ans[0], ans[1], pos[1], pos[0])
++
++    def do_right(self, arg):
++        '''moves character right'''
++        pos = self._pos()
++        pos[0] = (pos[0] + 1) % 10
++        print(f"Moved to ({pos[0]}, {pos[1]})")
++        msg = f"move {pos[0]} {pos[1]}\n"
++        s.sendall(bytes(msg.encode()))
++        ans = s.recv(1024).rstrip().decode()
++        if ans != 'nobody':
++            print(f"Moved to ...")
++            ans = ans.split()
++            self.encounter(ans[0], ans[1], pos[1], pos[0])
++
++    def do_EOF(self, arg):
++        '''End Of File AKA exit game'''
++        return 1
++
++    def complete_attack(self, text, line, begidx, endidx):
++        words = (line[:endidx] + ".").split()
++        DICT = []
++        cows = ["jgsbat"] + cowsay.list_cows()
++        weapons = ["sword", "spear", "axe"]
++        if len(words) == 2 and words[-1][:-1] in cows:
++            return [cows[(cows.index(words[-1][:-1]) + 1) % len(cows)]]
++        elif len(words) == 2:
++            DICT = cows
++        elif len(words) == 3:
++            DICT = ['with']
++        elif len(words) == 4 and words[-1][:-1] in weapons:
++            return [weapons[(weapons.index(words[-1][:-1]) + 1) % len(weapons)]]
++        elif len(words) == 4 and 'with' in words:
++            DICT = weapons
++        return [c for c in DICT if c.startswith(text)]
++
++    def complete_addmon(self, text, line, begidx, endidx):
++        words = (line[:endidx] + ".").split()
++        DICT = []
++        if len(words) > 2:
++            if "hello" in words:
++                words[words.index("hello") + 1] = "-"
++            if "hp" not in words:
++                DICT.append('hp')
++            if "hello" not in words:
++                DICT.append('hello')
++            if "coords" not in words:
++                DICT.append('coords')
++        if len(words) == 2:
++            DICT.extend(["jgsbat"] + cowsay.list_cows())
++        return [c for c in DICT if c.startswith(text)]
++
++if __name__ == '__main__':
++    host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
++    port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
++    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
++    s.connect((host, port))
++    MUDClient().cmdloop()
+diff --git a/20250317/1/server.py b/20250317/1/server.py
+new file mode 100644
+index 0000000..26002cf
+--- /dev/null
++++ b/20250317/1/server.py
+@@ -0,0 +1,42 @@
++import asyncio
++
++
++class MUDServer:
++    dungeon = [[0 for i in range(10)] for j in range(10)]
++    # self.dungeon[y][x] = hp, name, message
++    pos = [0, 0]
++    # pos = [x, y]
++
++    async def echo(self, reader, writer):
++        print("Player connected")
++        while data := await reader.readline():
++            data = data.decode()[:-1]
++            print('<< ', data)
++            if data.startswith("move "):
++                data = data.split()
++                x, y = map(int, [data[1], data[2]])
++                self.pos = x, y
++                if self.dungeon[y][x]:
++                    hp, name, message = self.dungeon[y][x]
++                    data = f'{name} {message}'
++                else:
++                    data = 'nobody'
++                print('>> ', data)
++                writer.write(bytes(data.encode()))
++            elif data == "pos":
++                data = f"{self.pos[0]} {self.pos[1]}"
++                print('>> ', data)
++                writer.write(bytes(data.encode()))
++            else:
++                print('>WARNING< Wrong command ignored', data)
++        print("Player disconnected")
++        writer.close()
++        await writer.wait_closed()
++
++    async def main(self):
++        server = await asyncio.start_server(self.echo, '0.0.0.0', 1337)
++        async with server:
++            await server.serve_forever()
++
++if __name__ == '__main__':
++    asyncio.run(MUDServer().main())
+-- 
+2.42.4
+
