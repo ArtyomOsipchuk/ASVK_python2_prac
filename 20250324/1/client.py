@@ -5,7 +5,8 @@ import readline
 import asyncio
 import sys
 import socket
-import shelex
+import shlex
+import cowsay
 
 class CowNetcat(cmd.Cmd):
     promt = '>> '
@@ -13,28 +14,28 @@ class CowNetcat(cmd.Cmd):
     
     def do_up(self, arg):
         '''moves character up'''
-        msg = f"up\n"
+        msg = f"move 0 1\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
         print(ans)
 
     def do_down(self, arg):
         '''moves character down'''
-        msg = f"down\n"
+        msg = f"move 0 -1\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
         print(ans)
 
     def do_left(self, arg):
         '''moves character left'''
-        msg = f"left\n"
+        msg = f"move -1 0\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
         print(ans)
 
     def do_right(self, arg):
         '''moves character right'''
-        msg = f"right\n"
+        msg = f"move 1 0\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
         print(ans)
@@ -48,13 +49,19 @@ class CowNetcat(cmd.Cmd):
 
     def do_quit(self, arg):
         '''quit dungeon'''
-        self.do_EOF(arg)
+        msg = f"quit\n"
+        s.sendall(bytes(msg.encode()))
+        ans = s.recv(1024).rstrip().decode()
+        print(ans)
+        self.running = False
+        return 1
 
     def do_EOF(self, arg):
         'End Of File'
         msg = f"quit\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
+        print(ans)
         self.running = False
         return 1
 
@@ -82,7 +89,7 @@ class CowNetcat(cmd.Cmd):
             damage = 15
         elif ww == 'axe':
             damage = 20
-        msg = f"attack name damage\n"
+        msg = f"attack {name} {damage} {ww}\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
         print(ans)
@@ -115,7 +122,7 @@ class CowNetcat(cmd.Cmd):
         if err_parse:
                 print("Invalid arguments")
                 return
-        msg = f"addmon {name} {hp} {y} {x} {hello}\n"
+        msg = f"addmon {name} {hp} {y} {x} '{hello}'\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
         print(ans)
@@ -156,6 +163,8 @@ class CowNetcat(cmd.Cmd):
 def spam(cmdline, timeout):
     while cmdline.running:
         time.sleep(timeout)
+        ans = s.recv(1024).rstrip().decode()
+        print(ans)
         print(f"\n{cmdline.prompt}{readline.get_line_buffer()}", end="", flush=True)
 
 
