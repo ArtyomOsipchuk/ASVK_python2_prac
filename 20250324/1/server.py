@@ -1,72 +1,98 @@
+#!/usr/bin/env python3
 import asyncio
+import cowsay
+
+clients = {}
+names = set()
+dungeon = [[0 for i in range(10)] for j in range(10)]
+# dungeon[y][x] = hp, name, message
+pos = [0, 0]
+# pos = [x, y]
 
 
-class MUDServer:
-    dungeon = [[0 for i in range(10)] for j in range(10)]
-    # self.dungeon[y][x] = hp, name, message
-    pos = [0, 0]
-    # pos = [x, y]
-
-    async def echo(self, reader, writer):
-        print("Player connected")
-        while data := await reader.readline():
-            data = data.decode()[:-1]
-            print('<< ', data)
-            if data.startswith("move "):
-                data = data.split()
-                x, y = map(int, [data[1], data[2]])
-                self.pos = x, y
-                if self.dungeon[y][x]:
-                    hp, name, message = self.dungeon[y][x]
-                    data = f'{name} {message}'
-                else:
-                    data = 'nobody'
-                print('>> ', data)
-                writer.write(bytes(data.encode()))
-            elif data == "pos":
-                data = f"{self.pos[0]} {self.pos[1]}"
-                print('>> ', data)
-                writer.write(bytes(data.encode()))
-            elif data.startswith("attack "):
-                data = data.split()
-                name, damage = data[1], int(data[2])
-                if not self.dungeon[self.pos[1]][self.pos[0]]:
-                    data = 'nobody'
-                else:
-                    hp, m_name, msg = self.dungeon[self.pos[1]][self.pos[0]]
-                    hp, damage = int(hp), int(damage)
-                    if name == m_name:
-                        new_hp = max(hp - damage, 0)
-                        data = f"{min(damage, hp)} {new_hp}"
-                        pos = self.pos
-                        if new_hp:
-                            self.dungeon[pos[1]][pos[0]] = new_hp, m_name, msg
-                        else:
-                            self.dungeon[pos[1]][pos[0]] = 0
+async def MUDServer(reader, writer):
+    me = None 
+    queue = asyncio.Queue()
+    send = asyncio.create_task(reader.readline())
+    receive = asyncio.create_task(queue.get())
+    while not reader.at_eof():
+        done, pending = await asyncio.wait([send, receive], return_when=asyncio.FIRST_COMPLETED)
+        for q in done:
+            if q is send:
+                send = asyncio.create_task(reader.readline())
+                message = q.result().decode().strip()
+                print('RECEIVED>>', [message])
+                if not message:
+                    continue
+                if not me:
+                    if message in names:
+                        ans = "Отказано в подключении. Такой пользователь уже есть"
+                        print('SENDED>>', [ans])
+                        writer.write(bytes(ans.encode()))
+                        break
                     else:
-                        data = 'nobody'
-                print('>> ', data)
-                writer.write(bytes(data.encode()))
-            elif data.startswith("add "):
-                add, name, hp, y, x, *message = data.split()
-                replaced = 0
-                y, x, hp = map(int, [y, x, hp])
-                if self.dungeon[y][x]:
-                    replaced = 1
-                self.dungeon[y][x] = hp, name, " ".join(message)
-                data = f"{replaced}"
-                print('>> ', data)
-                writer.write(bytes(data.encode()))
-            else:
-                print('>WARNING< Wrong command ignored', data)
-        print("Player disconnected")
-        writer.close()
-        await writer.wait_closed()
+                        me = message
+                        clients[me] = queue
+                        names.add(message)
+                        ans = f"Добро пожаловать в MUD, {me}!"
+                        print('SENDED>>', [ans])
+                        writer.write(bytes(ans.encode()))
+                        await writer.drain()
+                        for out in clients.values():
+                            ans = f"{me} присоединился к рейду!"
+                            print('MULTISENDED>>', [ans])
+                            await out.put(ans)
+                elif message == 'up':
+                    ans = ""
+                    print('SENDED>>', [ans])
+                    writer.write(bytes(ans.encode()))
+                    await writer.drain()
+                elif message.startswith('addmob '):
+                    print(f"Added monster {name} to ({x}, {y}) saying {hello}")
+                    if dungeon[y][x]:
+                        print("Replaced the old monster")
+                    dungeon[y][x] = [hp, name, hello]
+                elif message == "quit":
+                    ans = "До новых встреч на просторах MUD!"
+                    print('SENDED>>', [ans])
+                    writer.write(bytes(ans.encode()))
+                    for out in clients.values():
+                        ans = f"Пользователь {me} покинул подземелье..."
+                        print('MULTISENDED>>', [ans])
+                        await out.put(ans)
+                    del clients[me]
+                    names.remove(me)
+                    me = None
+                elif message == 'help':
+                    ans = '''Команды:
+                    help — вы здесь
+                    up \ down \ left \ right — движения по данжу
+                    attack — атаковать монстра
+                    addmon — добавить монстра
+                    quit — выбраться из подземелья'''
+                    print('SENDED>>', [ans])
+                    writer.write(bytes(ans.encode()))
+                    await writer.drain()
+                else:
+                    ans = "Неизвестная команда. Введите 'help' для вывода списка команд."
+                    print('SENDED>>', [ans])
+                    writer.write(bytes(ans.encode()))
+                    await writer.drain()
+            elif q is receive:
+                receive = asyncio.create_task(queue.get())
+                writer.write(bytes(f"{q.result()}\n".encode()))
+                await writer.drain()
+    send.cancel()
+    receive.cancel()
+    if me is not None:
+        del clients[me]
+        names.remove(me)
+    writer.close()
+    await writer.wait_closed()
 
-    async def main(self):
-        server = await asyncio.start_server(self.echo, '0.0.0.0', 1337)
-        async with server:
-            await server.serve_forever()
+async def main():
+    server = await asyncio.start_server(MUDServer, '0.0.0.0', 1337)
+    async with server:
+        await server.serve_forever()
 
-if __name__ == '__main__':
-    asyncio.run(MUDServer().main())
+asyncio.run(main())

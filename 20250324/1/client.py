@@ -1,87 +1,62 @@
+import cmd
+import threading
+import time
+import readline
+import asyncio
 import sys
 import socket
-import cowsay
-import cmd
-from io import StringIO
-import shlex
-import readline
+import shelex
 
-class MUDClient(cmd.Cmd):
-    print("<<< Welcome to Python-MUD 0.1 >>>")
-    prompt = ">>> "
-
-    def _pos(self):
-        msg = f"pos\n"
-        s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        return [int(i) for i in ans.split()]
+class CowNetcat(cmd.Cmd):
+    promt = '>> '
+    running = True
     
-    def encounter(self, name, message, y, x):
-        jgsbat = cowsay.read_dot_cow(StringIO("""    ,_                    _,
-    ) '-._  ,_    _,  _.-' (
-    )  _.-'.|\\ \b\\--//|.'-._  (
-     )'   .'\\/o\\/o\\/'.   `(
-      ) .' . \\====/ . '. (
-       )  / <<    >> \\  (
-        '-._/``  ``\\_.-'
-  jgs     __\\ \b\\'--'//__
-         (((""`  `"")))"""))
-        if name == "jgsbat":
-            print(cowsay.cowsay(message, cowfile=jgsbat))
-        else:
-            print(cowsay.cowsay(message, cow=name))
-
     def do_up(self, arg):
         '''moves character up'''
-        pos = self._pos()
-        pos[1] = (pos[1] + 1) % 10
-        print(f"Moved to ({pos[0]}, {pos[1]})")
-        msg = f"move {pos[0]} {pos[1]}\n"
+        msg = f"up\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
-        if ans != 'nobody':
-            print(f"Moved to ...")
-            name, *message = ans.split()
-            self.encounter(name, ' '.join(message), pos[1], pos[0])
+        print(ans)
 
     def do_down(self, arg):
         '''moves character down'''
-        pos = self._pos()
-        pos[1] = (pos[1] - 1) % 10
-        print(f"Moved to ({pos[0]}, {pos[1]})")
-        msg = f"move {pos[0]} {pos[1]}\n"
+        msg = f"down\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
-        if ans != 'nobody':
-            print(f"Moved to ...")
-            name, *message = ans.split()
-            self.encounter(name, ' '.join(message), pos[1], pos[0])
+        print(ans)
 
     def do_left(self, arg):
         '''moves character left'''
-        pos = self._pos()
-        pos[0] = (pos[0] - 1) % 10
-        print(f"Moved to ({pos[0]}, {pos[1]})")
-        msg = f"move {pos[0]} {pos[1]}\n"
+        msg = f"left\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
-        if ans != 'nobody':
-            print(f"Moved to ...")
-            name, *message = ans.split()
-            self.encounter(name, ' '.join(message), pos[1], pos[0])
+        print(ans)
 
     def do_right(self, arg):
         '''moves character right'''
-        pos = self._pos()
-        pos[0] = (pos[0] + 1) % 10
-        print(f"Moved to ({pos[0]}, {pos[1]})")
-        msg = f"move {pos[0]} {pos[1]}\n"
+        msg = f"right\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
-        if ans != 'nobody':
-            print(f"Moved to ...")
-            name, *message = ans.split()
-            self.encounter(name, ' '.join(message), pos[1], pos[0])
+        print(ans)
+
+    def do_help(self, arg):
+        '''returns help message'''
+        msg = f"help\n"
+        s.sendall(bytes(msg.encode()))
+        ans = s.recv(1024).rstrip().decode()
+        print(ans)
+
+    def do_quit(self, arg):
+        '''quit dungeon'''
+        self.do_EOF(arg)
+
+    def do_EOF(self, arg):
+        'End Of File'
+        msg = f"quit\n"
+        s.sendall(bytes(msg.encode()))
+        ans = s.recv(1024).rstrip().decode()
+        self.running = False
+        return 1
 
     def do_attack(self, arg):
         '''attack <имя монстра> with <имя оружия>'''
@@ -107,18 +82,10 @@ class MUDClient(cmd.Cmd):
             damage = 15
         elif ww == 'axe':
             damage = 20
-        msg = f"attack {name} {damage}\n"
+        msg = f"attack name damage\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(1024).rstrip().decode()
-        if ans == 'nobody':    
-            print(f"No", name, "here")
-        else:
-            damage, new_hp = map(int, ans.split()) 
-            print(f"Attacked {name}, damage {damage} hp")
-            if new_hp:
-                print(name,"now has", new_hp)
-            else:
-                print(name, "died")
+        print(ans)
 
     def do_addmon(self, arg):
         '''addmon <monster_name> hello <hello_string> hp <hitpoints> coords <x> <y>'''
@@ -145,18 +112,13 @@ class MUDClient(cmd.Cmd):
                                     y, x = int(y), int(x)
                                     if name in cowsay.list_cows() + ["jgsbat"]:
                                         err_parse = False
-                                        print(f"Added monster {name} to ({x}, {y}) saying {hello}")
-                                        msg = f"add {name} {hp} {y} {x} {hello}\n"
-                                        s.sendall(bytes(msg.encode()))
-                                        ans = s.recv(1024).rstrip().decode()
-                                        if int(ans):
-                                            print("Replaced the old monster")
         if err_parse:
                 print("Invalid arguments")
-
-    def do_EOF(self, arg):
-        '''End Of File AKA exit game'''
-        return 1
+                return
+        msg = f"addmon {name} {hp} {y} {x} {hello}\n"
+        s.sendall(bytes(msg.encode()))
+        ans = s.recv(1024).rstrip().decode()
+        print(ans)
 
     def complete_attack(self, text, line, begidx, endidx):
         words = (line[:endidx] + ".").split()
@@ -191,9 +153,26 @@ class MUDClient(cmd.Cmd):
             DICT.extend(["jgsbat"] + cowsay.list_cows())
         return [c for c in DICT if c.startswith(text)]
 
+def spam(cmdline, timeout):
+    while cmdline.running:
+        time.sleep(timeout)
+        print(f"\n{cmdline.prompt}{readline.get_line_buffer()}", end="", flush=True)
+
+
 if __name__ == '__main__':
-    host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
-    port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
-    MUDClient().cmdloop()
+    host = "localhost" #if len(sys.argv) < 2 else sys.argv[1]
+    port = 1337 #if len(sys.argv) < 3 else int(sys.argv[2])
+    if len(sys.argv) < 2:
+        print("Usage: python3 mymud.py <nickname>\nУкажите никнейм, чтобы мы знали, кем гордиться!")
+    else:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((host, port))
+        msg = f"{sys.argv[1]}\n"
+        s.sendall(bytes(msg.encode()))
+        ans = s.recv(4096).rstrip().decode()
+        print(ans)
+        if ans != 'Отказано в подключении. Такой пользователь уже есть':
+            cmdline = CowNetcat()
+            timer = threading.Thread(target=spam, args=(cmdline, 5))
+            timer.start()
+            cmdline.cmdloop()
