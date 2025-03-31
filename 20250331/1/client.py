@@ -12,40 +12,35 @@ class CowNetcat(cmd.Cmd):
     promt = '>> '
     running = True
     
+    def do_sayall(self, arg):
+        '''public message: sayall <строка>'''
+        msg = f"sayall {arg}\n"
+        s.sendall(bytes(msg.encode()))
+
     def do_up(self, arg):
         '''moves character up'''
         msg = f"move 0 1\n"
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
 
     def do_down(self, arg):
         '''moves character down'''
         msg = f"move 0 -1\n"
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
 
     def do_left(self, arg):
         '''moves character left'''
         msg = f"move -1 0\n"
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
 
     def do_right(self, arg):
         '''moves character right'''
         msg = f"move 1 0\n"
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
 
     def do_help(self, arg):
         '''returns help message'''
         msg = f"help\n"
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
 
     def do_quit(self, arg):
         '''quit dungeon'''
@@ -91,8 +86,6 @@ class CowNetcat(cmd.Cmd):
             damage = 20
         msg = f"attack {name} {damage} {ww}\n"
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
 
     def do_addmon(self, arg):
         '''addmon <monster_name> hello <hello_string> hp <hitpoints> coords <x> <y>'''
@@ -124,8 +117,6 @@ class CowNetcat(cmd.Cmd):
                 return
         msg = f"addmon {name} {hp} {y} {x} '{hello}'\n"
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
 
     def complete_attack(self, text, line, begidx, endidx):
         words = (line[:endidx] + ".").split()
@@ -163,8 +154,8 @@ class CowNetcat(cmd.Cmd):
 def spam(cmdline, timeout):
     while cmdline.running:
         time.sleep(timeout)
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
+        ans = s.recv(4096).rstrip().decode()
+        print("\n" + ans, end='')
         print(f"\n{cmdline.prompt}{readline.get_line_buffer()}", end="", flush=True)
 
 

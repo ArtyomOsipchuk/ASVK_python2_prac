@@ -45,7 +45,7 @@ class MUDServer:
                         continue
                     if not me:
                         if message in self.names:
-                            ans = "Отказано в подключении. Такой пользователь уже есть"
+                            ans = "Отказано в подключении. Такой пользователь уже есть\n"
                             print('SENDED>>', [ans])
                             writer.write(bytes(ans.encode()))
                             break
@@ -53,13 +53,13 @@ class MUDServer:
                             me = message
                             self.clients[me] = queue
                             self.names.add(message)
-                            ans = f"Добро пожаловать в MUD, {me}!"
+                            ans = f"Добро пожаловать в MUD, {me}!\n"
                             print('SENDED>>', [ans])
                             writer.write(bytes(ans.encode()))
                             await writer.drain()
                             for out in self.clients.values():
                                 if out != me:
-                                    ans = f"{me} присоединился к рейду!"
+                                    ans = f"{me} присоединился к рейду!\n"
                                     print('MULTISENDED>>', [ans])
                                     await out.put(ans)
                     elif message.startswith('move '):
@@ -67,7 +67,7 @@ class MUDServer:
                         y, x = int(y), int(x)
                         self.pos = [(self.pos[0] + x) % 10, (self.pos[1] + y) % 10]
                         pos = self.pos
-                        ans = f"Moved to {pos[0]} {pos[1]}"
+                        ans = f"Moved to {pos[0]} {pos[1]}\n"
                         if self.dungeon[pos[1]][pos[0]]:
                             ans += "\nMoved to ...\n"
                             ans += self.encounter(pos[1], pos[0])
@@ -78,14 +78,14 @@ class MUDServer:
                         #"addmon {name} {hp} {y} {x} {hello}\n"
                         addmob, name, hp, y, x, hello = shlex.split(message)
                         y, x = int(y), int(x)
-                        ans = f"Added monster {name} to ({x}, {y}) saying {hello}"
+                        ans = f"Added monster {name} to ({x}, {y}) saying {hello}\n"
                         if self.dungeon[y][x]:
-                            ans += "\nReplaced the old monster"
+                            ans += "\nReplaced the old monster\n"
                         self.dungeon[y][x] = [hp, name, hello]
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
-                        ans = f"Player {name} added monster {name} to ({x}, {y}) saying {hello}"
+                        ans = f"Player {name} added monster {name} to ({x}, {y}) saying {hello}\n"
                         for out in self.clients.values():
                                 if out != me:
                                     print('MULTISENDED>>', [ans])
@@ -96,33 +96,33 @@ class MUDServer:
                         pos = self.pos
                         ans = ''
                         if not self.dungeon[pos[1]][pos[0]] or self.dungeon[pos[1]][pos[0]][1] != name:
-                            ans = f'No {name} here'
+                            ans = f'No {name} here\n'
                         else:
                             hp, name, _ = self.dungeon[pos[1]][pos[0]]
-                            ans = f"Attacked {name} with {weapon}, damage {damage} hp"
+                            ans = f"Attacked {name} with {weapon}, damage {damage} hp\n"
                             hp = max(hp - damage, 0)
                             self.dungeon[pos[1]][pos[0]][0] = hp
                             if hp:
-                                ans += f'\n{name} now has {hp}'
+                                ans += f'\n{name} now has {hp}\n'
                             else:
-                                ans += f'\n{name} died'
+                                ans += f'\n{name} died\n'
                                 self.dungeon[pos[1]][pos[0]] = 0
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
                         if hp:
-                            ans = f"Player {me} attacked {name} with {weapon}, dealing {damage} damage. Now {name} has {hp} hp."
+                            ans = f"Player {me} attacked {name} with {weapon}, dealing {damage} damage. Now {name} has {hp} hp.\n"
                         else:
-                            ans = f"Player {me} attacked {name} with {weapon}, dealing fatal {damage} damage. {name} is dead now."
+                            ans = f"Player {me} attacked {name} with {weapon}, dealing fatal {damage} damage. {name} is dead now.\n"
                         for out in self.clients.values():
                                 if out != me:
                                     print('MULTISENDED>>', [ans])
                                     await out.put(ans)
                     elif message == "quit":
-                        ans = "До новых встреч на просторах MUD!"
+                        ans = "До новых встреч на просторах MUD!\n"
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
-                        ans = f"Пользователь {me} покинул подземелье..."
+                        ans = f"Пользователь {me} покинул подземелье...\n"
                         for out in self.clients.values():
                             if out != me:
                                 print('MULTISENDED>>', [ans])
@@ -130,18 +130,25 @@ class MUDServer:
                         del self.clients[me]
                         self.names.remove(me)
                         me = None
+                    elif message.startswith("sayall "):
+                        sayall, *msg = shlex.split(message)
+                        ans = f"{me}: {msg[0]}"
+                        for out in self.clients.values():
+                            print('MULTISENDED>>', [ans])
+                            await out.put(ans)
                     elif message == 'help':
                         ans = '''Команды:
                         help — вы здесь
                         up \\ down \\ left \\ right — движения по данжу
-                        attack — атаковать монстра
+                        attack <name> [with <weapon>] — атаковать монстра
                         addmon — добавить монстра
-                        quit — выбраться из подземелья'''
+                        sayall — <строка>, где <строка> - либо одно слово (без пробельных символов), либо строка в кавычках 
+                        quit — выбраться из подземелья\n'''
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
                     else:
-                        ans = "Неизвестная команда. Введите 'help' для вывода списка команд."
+                        ans = "Неизвестная команда. Введите 'help' для вывода списка команд.\n"
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
