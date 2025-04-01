@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
+"""Setup of server for Multi User Dungeon."""
 import asyncio
 import cowsay
 import shlex
 from io import StringIO
 
+
 class MUDServer:
+    """Server for Multy User Dungeon."""
+
     clients = {}
     names = set()
     dungeon = [[0 for i in range(10)] for j in range(10)]
@@ -13,6 +17,7 @@ class MUDServer:
     # pos = [x, y]
 
     def encounter(self, y, x):
+        """Render monster encounders by python-cowsay module."""
         jgsbat = cowsay.read_dot_cow(StringIO("""    ,_                    _,
         ) '-._  ,_    _,  _.-' (
         )  _.-'.|\\ \b\\--//|.'-._  (
@@ -28,9 +33,9 @@ class MUDServer:
         else:
             return cowsay.cowsay(message, cow=name)
 
-
     async def server(self, reader, writer):
-        me = None 
+        """Host async server to handle messages."""
+        me = None
         queue = asyncio.Queue()
         send = asyncio.create_task(reader.readline())
         receive = asyncio.create_task(queue.get())
@@ -75,21 +80,21 @@ class MUDServer:
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
                     elif message.startswith('addmon '):
-                        #"addmon {name} {hp} {y} {x} {hello}\n"
+                        # "addmon {name} {hp} {y} {x} {hello}\n"
                         addmob, name, hp, y, x, hello = shlex.split(message)
                         y, x = int(y), int(x)
                         ans = f"Added monster {name} to ({x}, {y}) saying {hello}\n"
                         if self.dungeon[y][x]:
                             ans += "\nReplaced the old monster\n"
-                        self.dungeon[y][x] = [hp, name, hello]
+                        self.dungeon[y][x] = [int(hp), name, hello]
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
                         ans = f"Player {name} added monster {name} to ({x}, {y}) saying {hello}\n"
                         for out in self.clients.values():
-                                if out != me:
-                                    print('MULTISENDED>>', [ans])
-                                    await out.put(ans)
+                            if out != me:
+                                print('MULTISENDED>>', [ans])
+                                await out.put(ans)
                     elif message.startswith('attack '):
                         attack, name, damage, weapon = shlex.split(message)
                         damage = int(damage)
@@ -115,9 +120,9 @@ class MUDServer:
                         else:
                             ans = f"Player {me} attacked {name} with {weapon}, dealing fatal {damage} damage. {name} is dead now.\n"
                         for out in self.clients.values():
-                                if out != me:
-                                    print('MULTISENDED>>', [ans])
-                                    await out.put(ans)
+                            if out != me:
+                                print('MULTISENDED>>', [ans])
+                                await out.put(ans)
                     elif message == "quit":
                         ans = "До новых встреч на просторах MUD!\n"
                         print('SENDED>>', [ans])
@@ -142,13 +147,14 @@ class MUDServer:
                         up \\ down \\ left \\ right — движения по данжу
                         attack <name> [with <weapon>] — атаковать монстра
                         addmon — добавить монстра
-                        sayall — <строка>, где <строка> - либо одно слово (без пробельных символов), либо строка в кавычках 
+                        sayall — <строка> (либо одно слово, либо строка в кавычках)
                         quit — выбраться из подземелья\n'''
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
                     else:
-                        ans = "Неизвестная команда. Введите 'help' для вывода списка команд.\n"
+                        ans = "Неизвестная команда.\
+                                Введите 'help' для вывода списка команд.\n"
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
@@ -164,7 +170,9 @@ class MUDServer:
         writer.close()
         await writer.wait_closed()
 
+
 async def main():
+    """Start server on localhost."""
     m = MUDServer()
     server = await asyncio.start_server(m.server, '0.0.0.0', 1337)
     async with server:
