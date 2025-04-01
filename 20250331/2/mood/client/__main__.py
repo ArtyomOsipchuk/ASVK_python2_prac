@@ -18,7 +18,7 @@ class CowNetcat(cmd.Cmd):
 
     def do_sayall(self, arg):
         """Send public message."""
-        msg = "sayall {arg}\n"
+        msg = f"sayall {arg}\n"
         s.sendall(bytes(msg.encode()))
 
     def do_up(self, arg):
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python3 mymud.py <nickname> [host] [port] \n\
                 Укажите никнейм, чтобы мы знали, кем гордиться!")
-    elif len(sys.argv) < 4:
+    elif len(sys.argv) == 3:
         print("Usage: python3 mymud.py <nickname> [host] [port] \n \
                 Укажите порт.")
     else:
