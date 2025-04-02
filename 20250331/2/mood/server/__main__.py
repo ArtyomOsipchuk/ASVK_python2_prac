@@ -102,6 +102,9 @@ class MUDServer:
                         ans = ''
                         if not self.dungeon[pos[1]][pos[0]] or self.dungeon[pos[1]][pos[0]][1] != name:
                             ans = f'No {name} here\n'
+                            print('SENDED>>', [ans])
+                            writer.write(bytes(ans.encode()))
+                            await writer.drain()
                         else:
                             hp, name, _ = self.dungeon[pos[1]][pos[0]]
                             ans = f"Attacked {name} with {weapon}, damage {damage} hp\n"
@@ -112,17 +115,17 @@ class MUDServer:
                             else:
                                 ans += f'\n{name} died\n'
                                 self.dungeon[pos[1]][pos[0]] = 0
-                        print('SENDED>>', [ans])
-                        writer.write(bytes(ans.encode()))
-                        await writer.drain()
-                        if hp:
-                            ans = f"Player {me} attacked {name} with {weapon}, dealing {damage} damage. Now {name} has {hp} hp.\n"
-                        else:
-                            ans = f"Player {me} attacked {name} with {weapon}, dealing fatal {damage} damage. {name} is dead now.\n"
-                        for out in self.clients.values():
-                            if out != me:
-                                print('MULTISENDED>>', [ans])
-                                await out.put(ans)
+                            print('SENDED>>', [ans])
+                            writer.write(bytes(ans.encode()))
+                            await writer.drain()
+                            if hp:
+                                ans = f"Player {me} attacked {name} with {weapon}, dealing {damage} damage. Now {name} has {hp} hp.\n"
+                            else:
+                                ans = f"Player {me} attacked {name} with {weapon}, dealing fatal {damage} damage. {name} is dead now.\n"
+                            for out in self.clients.values():
+                                if out != me:
+                                    print('MULTISENDED>>', [ans])
+                                    await out.put(ans)
                     elif message == "quit":
                         ans = "До новых встреч на просторах MUD!\n"
                         print('SENDED>>', [ans])
