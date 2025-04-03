@@ -10,6 +10,14 @@ import shlex
 import cowsay
 
 
+if 'libedit' in readline.__doc__:
+    print("Found libedit readline")
+    readline.parse_and_bind("bind ^I rl_complete")
+else:
+    print("Found gnu readline")
+    readline.parse_and_bind("tab: complete")
+
+
 class CowNetcat(cmd.Cmd):
     """Netcat client version for MUD."""
 
@@ -145,6 +153,7 @@ class CowNetcat(cmd.Cmd):
         """Addmon func completion."""
         words = (line[:endidx] + ".").split()
         DICT = []
+        cows = ["jgsbat"] + cowsay.list_cows()
         if len(words) > 2:
             if "hello" in words:
                 words[words.index("hello") + 1] = "-"
@@ -154,8 +163,10 @@ class CowNetcat(cmd.Cmd):
                 DICT.append('hello')
             if "coords" not in words:
                 DICT.append('coords')
-        if len(words) == 2:
-            DICT.extend(["jgsbat"] + cowsay.list_cows())
+        if len(words) == 2 and words[-1][:-1] in cows:
+            return [cows[(cows.index(words[-1][:-1]) + 1) % len(cows)]]
+        elif len(words) == 2:
+            DICT.extend(cows)
         return [c for c in DICT if c.startswith(text)]
 
 
