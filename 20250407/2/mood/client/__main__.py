@@ -8,13 +8,14 @@ import sys
 import socket
 import shlex
 import cowsay
-
+import argparse
+import os
 
 if 'libedit' in readline.__doc__:
-    print("Found libedit readline")
+    # print("Found libedit readline")
     readline.parse_and_bind("bind ^I rl_complete")
 else:
-    print("Found gnu readline")
+    # print("Found gnu readline")
     readline.parse_and_bind("tab: complete")
 
 
@@ -23,6 +24,18 @@ class CowNetcat(cmd.Cmd):
 
     prompt = '>> '
     running = True
+    
+    def __init__(self, command_file=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if command_file:
+            self.use_rawinput = False
+            self.command_file = open(command_file, 'r')
+            self.stdin = self.command_file
+            for command in self.command_file.readlines():
+                print(">>", command, end='')
+                super().onecmd(command)
+                time.sleep(1)
+            self.command_file.close()
 
     def do_sayall(self, arg):
         """Send public message."""
@@ -61,21 +74,24 @@ class CowNetcat(cmd.Cmd):
         ans = s.recv(1024).rstrip().decode()
         print(ans)
         self.running = False
-        return 1
+        if self.command_file:
+            self.command_file.close()
+        return True
 
     def do_EOF(self, arg):
         """End Of File."""
         msg = 'quit\n'
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
-        self.running = False
-        return 1
+        #ans = s.recv(1024).rstrip().decode()
+        #self.running = False
+        if self.command_file:
+            self.command_file.close()
+        return True
 
     def do_attack(self, arg):
-        """Attack <имя монстра> with <имя оружия>."""
+        """Use: attack <имя монстра> with <имя оружия>."""
         arg = arg.split()
-        if len(arg) < 1 or len(arg) == 2:
+        if len(arg) > 3:
             print("Invalid arguments")
             return
         name = arg[0]
@@ -100,7 +116,7 @@ class CowNetcat(cmd.Cmd):
         s.sendall(bytes(msg.encode()))
 
     def do_addmon(self, arg):
-        """Addmon <name> hello <message> hp <hitpoints> coords <x> <y>."""
+        """Use: addmon <name> hello <message> hp <hitpoints> coords <x> <y>."""
         err_parse = True
         if len(arg.split()) < 2:
             print("Invalid arguments")
@@ -170,34 +186,48 @@ class CowNetcat(cmd.Cmd):
         return [c for c in DICT if c.startswith(text)]
 
 
-def spam(cmdline, timeout):
+def spam(cmdline, timeout, testing_mode=False):
     """Readline buffer flushing."""
     while cmdline.running:
         time.sleep(timeout)
         ans = s.recv(4096).rstrip().decode()
         print("\n" + ans, end='')
-        print(f"\n{cmdline.prompt}{readline.get_line_buffer()}",
-              end="", flush=True)
+        if not testing_mode:
+            print(f"\n{cmdline.prompt}{readline.get_line_buffer()}",
+                  end="", flush=True)
 
 
 if __name__ == '__main__':
-    host = "localhost"if len(sys.argv) < 3 else sys.argv[2]
-    port = 1337 if len(sys.argv) < 4 else int(sys.argv[3])
-    if len(sys.argv) < 2:
-        print("Usage: python3 mymud.py <nickname> [host] [port] \n\
-                Укажите никнейм, чтобы мы знали, кем гордиться!")
-    elif len(sys.argv) == 3:
-        print("Usage: python3 mymud.py <nickname> [host] [port] \n \
-                Укажите порт.")
-    else:
+    parser = argparse.ArgumentParser(
+                    prog='python3 -m mood.client',
+                    description='Client for MultiUserDungeon',
+                    epilog='Cool game for cool students.')
+    parser.add_argument("username", help="Никнейм, чтобы мы знали, кем гордиться!")
+    parser.add_argument("host", nargs='?', default='localhost', help="Адрес хост-сервера")
+    parser.add_argument("port", nargs='?', type=int, default=1337, help="Порт хост-сервера")
+    parser.add_argument("--file", default=None, help="Получение команд из командного файла")
+    args = parser.parse_args()
+    try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((host, port))
-        msg = f"{sys.argv[1]}\n"
+        s.connect((args.host, args.port))
+        msg = f"{args.username}\n"
         s.sendall(bytes(msg.encode()))
         ans = s.recv(4096).rstrip().decode()
         print(ans)
         if ans != 'Отказано в подключении. Такой пользователь уже есть':
-            cmdline = CowNetcat()
+            if args.file:
+                if not os.path.exists(args.file):
+                    print(f"Ошибка: файл '{args.file}' не найден")
+                elif not args.file.endswith('.mood'):
+                    print("Ошибка: недопустимы расширения файла, кроме .mood")
+            cmdline = CowNetcat(command_file=args.file)
             timer = threading.Thread(target=spam, args=(cmdline, 5))
             timer.start()
-            cmdline.cmdloop()
+            try:
+                cmdline.cmdloop()
+            except ValueError:
+                pass
+            timer.join()
+            s.close()
+    except ConnectionRefusedError:
+        print("Соединение отклонено.")

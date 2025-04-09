@@ -235,8 +235,9 @@ async def main():
     server = await asyncio.start_server(m.server, '0.0.0.0', 1337)
     timeout = 10
     admin_name = 'admin'
-    timer = threading.Thread(target=m.wandering_monster, args=(admin_name, timeout))
-    timer.start()
+    # Бродячие монстры выключены для режима отладки
+    # timer = threading.Thread(target=m.wandering_monster, args=(admin_name, timeout))
+    # timer.start()
     async with server:
         await server.serve_forever()
     timer.cancel()
