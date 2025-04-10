@@ -114,8 +114,8 @@ class MUDServer:
                         pos = self.pos[me]
                         ans = f"Moved to {pos[0]} {pos[1]}\n"
                         if self.dungeon[pos[1]][pos[0]]:
-                            ans += "\nMoved to ...\n"
-                            ans += self.encounter(pos[1], pos[0])
+                            ans += "Moved to ...\n"
+                            ans += self.encounter(pos[1], pos[0]) + '\n'
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
@@ -152,9 +152,9 @@ class MUDServer:
                             hp = max(hp - damage, 0)
                             self.dungeon[pos[1]][pos[0]][0] = hp
                             if hp:
-                                ans += f'\n{name} now has {hp}\n'
+                                ans += f'{name} now has {hp}\n'
                             else:
-                                ans += f'\n{name} died\n'
+                                ans += f'{name} died\n'
                                 self.monsters_pos.remove((pos[0], pos[1]))
                                 self.dungeon[pos[1]][pos[0]] = 0
                             print('SENDED>>', [ans])
@@ -182,7 +182,7 @@ class MUDServer:
                         return
                     elif message.startswith("sudo "):
                         sudo, name, verb, *names = shlex.split(message)
-                        ans = f"{name} moved one cell {verb}"
+                        ans = f"{name} moved one cell {verb}\n"
                         for out in self.clients.values():
                             print('MULTISENDED>>', [ans])
                             await out.put(ans)
@@ -194,7 +194,7 @@ class MUDServer:
                                 await self.clients[i].put(ans_fight)
                     elif message.startswith("sayall "):
                         sayall, *msg = shlex.split(message)
-                        ans = f"{me}: {msg[0]}"
+                        ans = f"{me}: {msg[0]}\n"
                         for out in self.clients.values():
                             print('MULTISENDED>>', [ans])
                             await out.put(ans)

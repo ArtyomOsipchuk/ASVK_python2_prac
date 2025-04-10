@@ -10,6 +10,7 @@ import shlex
 import cowsay
 import argparse
 import os
+from .__common__ import *
 
 if 'libedit' in readline.__doc__:
     # print("Found libedit readline")
@@ -28,14 +29,14 @@ class CowNetcat(cmd.Cmd):
     def __init__(self, command_file=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if command_file:
+            self.prompt = ''
+            self.onecmd = self._onecmd
             self.use_rawinput = False
-            self.command_file = open(command_file, 'r')
-            self.stdin = self.command_file
-            for command in self.command_file.readlines():
-                print(">>", command, end='')
-                super().onecmd(command)
-                time.sleep(1)
-            self.command_file.close()
+            self.stdin = command_file
+
+    def _onecmd(self, line):
+        time.sleep(1)
+        return super().onecmd(line)
 
     def do_sayall(self, arg):
         """Send public message."""
@@ -71,32 +72,33 @@ class CowNetcat(cmd.Cmd):
         """Quit dungeon."""
         msg = "quit\n"
         s.sendall(bytes(msg.encode()))
-        ans = s.recv(1024).rstrip().decode()
-        print(ans)
+        #ans = s.recv(1024).rstrip().decode()
+        #print(ans)
         self.running = False
-        if self.command_file:
-            self.command_file.close()
         return True
 
     def do_EOF(self, arg):
         """End Of File."""
         msg = 'quit\n'
         s.sendall(bytes(msg.encode()))
-        #ans = s.recv(1024).rstrip().decode()
-        #self.running = False
-        if self.command_file:
-            self.command_file.close()
+        self.running = False
         return True
 
     def do_attack(self, arg):
         """Use: attack <имя монстра> with <имя оружия>."""
         arg = arg.split()
         if len(arg) > 3:
-            print("Invalid arguments")
+            print("Too many arguments")
             return
+        if len(arg) < 1:
+            print("Specify monster name")
+            return 
         name = arg[0]
         if len(arg) > 1 and arg[1] != 'with':
             print("Invalid arguments")
+            return
+        if len(arg) == 2:
+            print("Attack with what?")
             return
         if len(arg) == 1:
             ww = 'sword'
@@ -220,13 +222,11 @@ if __name__ == '__main__':
                     print(f"Ошибка: файл '{args.file}' не найден")
                 elif not args.file.endswith('.mood'):
                     print("Ошибка: недопустимы расширения файла, кроме .mood")
+                args.file = open(args.file, 'r')
             cmdline = CowNetcat(command_file=args.file)
-            timer = threading.Thread(target=spam, args=(cmdline, 5))
+            timer = threading.Thread(target=spam, args=(cmdline, REFRESH_TIME))
             timer.start()
-            try:
-                cmdline.cmdloop()
-            except ValueError:
-                pass
+            cmdline.cmdloop()
             timer.join()
             s.close()
     except ConnectionRefusedError:
