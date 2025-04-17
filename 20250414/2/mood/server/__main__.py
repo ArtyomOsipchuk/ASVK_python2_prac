@@ -10,7 +10,7 @@ import time
 import socket
 import gettext
 import locale
-
+import os
 
 class MUDServer:
     """Server for Multy User Dungeon."""
@@ -28,8 +28,9 @@ class MUDServer:
     # locales = {name: locale}
     monsters_pos = set()
     # monsters_pos = set(tuple(x, y))
+    locales_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'locales')
     LOCALES = {
-        "ru_RU.UTF-8": gettext.translation("MUD", "po", ["ru"]),
+        "ru_RU.UTF-8": gettext.translation("MUD", locales_dir, ["ru"]),
         "en_US.UTF-8": gettext.NullTranslations(),
     }
 
