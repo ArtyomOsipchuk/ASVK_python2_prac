@@ -169,6 +169,14 @@ class CowNetcat(cmd.Cmd):
         if len(words) == 2 and words[-1][:-1] in DICT:
             return [DICT[(DICT.index(words[-1][:-1]) + 1) % len(DICT)]]
         return [c for c in DICT if c.startswith(text)]
+    
+    def complete_locale(self, text, line, begidx, endidx):
+        """Set up locale func completion."""
+        words = (line[:endidx] + ".").split()
+        DICT = ['ru_RU.UTF-8', 'en_US.UTF-8']
+        if len(words) == 2 and words[-1][:-1] in DICT:
+            return [DICT[(DICT.index(words[-1][:-1]) + 1) % len(DICT)]]
+        return [c for c in DICT if c.startswith(text)]
 
     def complete_attack(self, text, line, begidx, endidx):
         """Attack func completion."""

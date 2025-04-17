@@ -11,17 +11,6 @@ import socket
 import gettext
 import locale
 
-LOCALES = {
-    "ru_RU.UTF-8": gettext.translation("MUD", "po", ["ru"]),
-    "en_US.UTF-8": gettext.NullTranslations(),
-}
-
-def _(text, locale):
-    return LOCALES[locale].gettext(text)
-
-def __(text, ntext, n, locale):
-    return LOCALES[locale].ngettext(text, ntext, n)
-
 
 class MUDServer:
     """Server for Multy User Dungeon."""
@@ -39,6 +28,16 @@ class MUDServer:
     # locales = {name: locale}
     monsters_pos = set()
     # monsters_pos = set(tuple(x, y))
+    LOCALES = {
+        "ru_RU.UTF-8": gettext.translation("MUD", "po", ["ru"]),
+        "en_US.UTF-8": gettext.NullTranslations(),
+    }
+
+    def _(self, text, locale):
+        return self.LOCALES[locale].gettext(text)
+
+    def ngettext(self, text, ntext, n, locale):
+        return self.LOCALES[locale].ngettext(text, ntext, n)
 
     def __init__(self, *args):
         self.timer = threading.Thread(target=self.wandering_monster, args=(self.admin_name, self.timeout))
@@ -116,7 +115,7 @@ class MUDServer:
                         continue
                     if not me:
                         if message in self.names:
-                            ans = _("Connection refused. User with nick {} already exists\n", locale).format(message)
+                            ans = self._("Connection refused. User with nick {} already exists\n", locale).format(message)
                             print('SENDED>>', [ans])
                             writer.write(bytes(ans.encode()))
                             break
@@ -126,14 +125,13 @@ class MUDServer:
                             self.clients[me] = queue
                             self.locales[queue] = locale
                             self.names.add(message)
-                            print(_)
-                            ans = _("Welcome to MUD, {}!\n", locale).format(me)
+                            ans = self._("Welcome to MUD, {}!\n", locale).format(me)
                             print('SENDED>>', [ans])
                             writer.write(bytes(ans.encode()))
                             await writer.drain()
                             for out in self.clients.values():
                                 if out != self.clients[me]:
-                                    ans = _("{} connected to raid!\n", self.locales[out]).format(me)
+                                    ans = self._("{} connected to raid!\n", self.locales[out]).format(me)
                                     print('MULTISENDED>>', [ans])
                                     await out.put(ans)
                     elif message.startswith('move '):
@@ -141,17 +139,21 @@ class MUDServer:
                         y, x = int(y), int(x)
                         self.pos[me] = [(self.pos[me][0] + x) % 10, (self.pos[me][1] + y) % 10]
                         pos = self.pos[me]
-                        ans = _("Moved to {} {}\n", locale).format(pos[0], pos[1])
+                        ans = self._("Moved to {} {}\n", locale).format(pos[0], pos[1])
                         if self.dungeon[pos[1]][pos[0]]:
-                            ans += _("Moved to ...\n", locale)
+                            ans += self._("Moved to ...\n", locale)
                             ans += self.encounter(pos[1], pos[0]) + '\n'
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
                     elif message.startswith('locale '):
-                        locl, locale = shlex.split(message)
-                        ans = _("Set up locale: {}\n", locale).format(locale)
-                        self.locales[self.client[me]] = locale
+                        locl, new_locale = shlex.split(message)
+                        if new_locale in self.LOCALES:
+                            locale = new_locale
+                            ans = self._("Set up locale: {}\n", locale).format(locale)
+                            self.locales[self.clients[me]] = locale
+                        else:
+                            ans = self._("Only ru_RU.UTF-8 and en_EN.UTF-8 locales are available\n", locale)
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
@@ -159,17 +161,17 @@ class MUDServer:
                         # "addmon {name} {hp} {y} {x} {hello}\n"
                         addmob, name, hp, y, x, hello = shlex.split(message)
                         y, x = int(y), int(x)
-                        ans = _("Added monster {} to ({}, {}) saying {}\n", locale).format(name, x, y, hello)
+                        ans = self._("Added monster {} to ({}, {}) saying {}\n", locale).format(name, x, y, hello)
                         self.monsters_pos.add((x, y))
                         if self.dungeon[y][x]:
-                            ans += _("\nReplaced the old monster\n", locale)
+                            ans += self._("\nReplaced the old monster\n", locale)
                         self.dungeon[y][x] = [int(hp), name, hello]
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
                         for out in self.clients.values():
                             if out != self.clients[me]:
-                                ans = __(
+                                ans = self.ngettext(
                                         "Player {} added monster {} with {} hitpoint to ({}, {}) saying {}\n",
                                         "Player {} added monster {} with {} hitpoints to ({}, {}) saying {}\n",
                                         hp, self.locales[out]).format(me, name, hp, x, y, hello)
@@ -180,10 +182,10 @@ class MUDServer:
                         for out in self.clients.values():
                             if option == 'on':
                                 self.pause_wandering.clear()
-                                ans = _("Moving monsters: on", self.locales[out])
+                                ans = self._("Moving monsters: on\n", self.locales[out])
                             else:
                                 self.pause_wandering.set()
-                                ans = _("Moving monsters: off", self.locales[out])
+                                ans = self._("Moving monsters: off\n", self.locales[out])
                             print('MULTISENDED>>', [ans])
                             await out.put(ans)
                     elif message.startswith('attack '):
@@ -192,47 +194,47 @@ class MUDServer:
                         pos = self.pos[me]
                         ans = ''
                         if not self.dungeon[pos[1]][pos[0]] or self.dungeon[pos[1]][pos[0]][1] != name:
-                            ans = _('No {} here\n', locale).format(name)
+                            ans = self._('No {} here\n', locale).format(name)
                             print('SENDED>>', [ans])
                             writer.write(bytes(ans.encode()))
                             await writer.drain()
                         else:
                             hp, name, _ = self.dungeon[pos[1]][pos[0]]
-                            ans = __("Attacked {} with {}, damage {} hitpoint\n",
+                            ans = self.ngettext("Attacked {} with {}, damage {} hitpoint\n",
                                      "Attacked {} with {}, damage {} hitpoints\n",
                                      damage, locale).format(name, weapon, damage)
                             hp = max(hp - damage, 0)
                             self.dungeon[pos[1]][pos[0]][0] = hp
                             if hp:
-                                ans += __('{} now has {} hitpoint\n', '{} now has {} hitpoints\n', hp, locale).format(name, hp)
+                                ans += self.ngettext('{} now has {} hitpoint\n', '{} now has {} hitpoints\n', hp, locale).format(name, hp)
                             else:
-                                ans += _('{} died\n', locale).format(name)
+                                ans += self._('{} died\n', locale).format(name)
                                 self.monsters_pos.remove((pos[0], pos[1]))
                                 self.dungeon[pos[1]][pos[0]] = 0
                             print('SENDED>>', [ans])
                             writer.write(bytes(ans.encode()))
                             await writer.drain()
                             for out in self.clients.values():
-                                if out != me:
+                                if out != self.clients[me]:
                                     if hp:
-                                        ans = __(
-                                                "Player {} attacked {} with {}, dealing {} point of damage.",
-                                                "Player {} attacked {} with {}, dealing {} points of damage.",
-                                                damage, self.locales[out]).format(me, name, weapon, damage) + __("Now {} has {} hitpoint.\n",
+                                        ans = self.ngettext(
+                                                "Player {} attacked {} with {}, dealing {} point of damage.\n",
+                                                "Player {} attacked {} with {}, dealing {} points of damage.\n",
+                                                damage, self.locales[out]).format(me, name, weapon, damage) + self.ngettext("Now {} has {} hitpoint.\n",
                                                 "Now {} has {} hitpoints.\n",
                                                 hp, self.locales[out]).format(name, hp)
                                     else:
-                                        ans = __(
+                                        ans = self.ngettext(
                                                 "Player {} attacked {} with {}, dealing fatal {} point of damage. {} is dead now.\n",
                                                 "Player {} attacked {} with {}, dealing fatal {} points of damage. {} is dead now.\n", damage, self.locales[out]).format(me, name, weapon, damage, name)
                                     print('MULTISENDED>>', [ans])
                                     await out.put(ans)
                     elif message == "quit":
-                        ans = _("Goodbye, {}! See you later in fields of MUD!\n", locale).format(me)
+                        ans = self._("Goodbye, {}! See you later in fields of MUD!\n", locale).format(me)
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         for out in self.clients.values():
-                            ans = _("User {} leave the dungeon...\n", self.locales[out]).format(me)
+                            ans = self._("User {} leave the dungeon...\n", self.locales[out]).format(me)
                             print('MULTISENDED>>', [ans])
                             await out.put(ans)
                         del self.clients[me]
@@ -242,7 +244,7 @@ class MUDServer:
                     elif message.startswith("sudo "):
                         sudo, name, verb, *names = shlex.split(message)
                         for out in self.clients.values():
-                            ans = _("{} moved one cell {}\n", self.locales[out]).format(name, verb)
+                            ans = self._("{} moved one cell {}\n", self.locales[out]).format(name, verb)
                             print('MULTISENDED>>', [ans])
                             await out.put(ans)
                         if names:
@@ -258,18 +260,18 @@ class MUDServer:
                             print('MULTISENDED>>', [ans])
                             await out.put(ans)
                     elif message == 'help':
-                        ans = _('''Commands:
+                        ans = self._('''Commands:
                             help - you're here
                             up \\ down \\ left \\ right — movement
                             attack <name> [with <weapon>] — attack monster
                             addmon <name> hello <message> hp <hp> coords <x> <y> — add monster
                             sayall <string> — (use brackets if not one word)
-                            quit — leave the dungeon\n''', locales)
+                            quit — leave the dungeon\n''', locale)
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))
                         await writer.drain()
                     else:
-                        ans = _("Unknown command.\
+                        ans = self._("Unknown command.\
                                 Enter 'help' for command list.\n", locale)
                         print('SENDED>>', [ans])
                         writer.write(bytes(ans.encode()))

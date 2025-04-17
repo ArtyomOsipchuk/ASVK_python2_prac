@@ -7,57 +7,57 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-16 16:27+0300\n"
+"POT-Creation-Date: 2025-04-17 10:27+0300\n"
 "PO-Revision-Date: 2025-04-16 16:02+0300\n"
 "Last-Translator: Artyom Osipchuk <EMAIL@ADDRESS>\n"
 "Language: ru_RU\n"
 "Language-Team: Russian <LL@li.org>\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : "
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n%10==1 && n%100!=11 ? 3 : "
 "n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: mood/server/__main__.py:26
-msgid "Hello, world!"
-msgstr "Привет, мир!"
-
-#: mood/server/__main__.py:121
+#: mood/server/__main__.py:118
 #, python-brace-format
 msgid "Connection refused. User with nick {} already exists\n"
 msgstr "Соединение отклонено. Пользователь с ником {} уже есть\n"
 
-#: mood/server/__main__.py:132
+#: mood/server/__main__.py:128
 #, python-brace-format
 msgid "Welcome to MUD, {}!\n"
 msgstr "Добро пожаловать в MUD {}!\n"
 
-#: mood/server/__main__.py:138
+#: mood/server/__main__.py:134
 #, python-brace-format
 msgid "{} connected to raid!\n"
 msgstr "{} присоединился к рейду!\n"
 
-#: mood/server/__main__.py:146
+#: mood/server/__main__.py:142
 #, python-brace-format
 msgid "Moved to {} {}\n"
 msgstr "Переместился на {} {}\n"
 
-#: mood/server/__main__.py:148
+#: mood/server/__main__.py:144
 msgid "Moved to ...\n"
 msgstr "Переместился на...\n"
 
-#: mood/server/__main__.py:155
+#: mood/server/__main__.py:153
 #, python-brace-format
 msgid "Set up locale: {}\n"
 msgstr "Установлена локаль: {}\n"
 
-#: mood/server/__main__.py:163
+#: mood/server/__main__.py:156
+msgid "Only ru_RU.UTF-8 and en_EN.UTF-8 locales are available\n"
+msgstr "Доступны только локали ru_RU.UTF-8 и en_EN.UTF-8\n"
+
+#: mood/server/__main__.py:164
 #, python-brace-format
 msgid "Added monster {} to ({}, {}) saying {}\n"
 msgstr "Добавлен монстр {} на ({}, {}), говорящий {}\n"
 
-#: mood/server/__main__.py:166
+#: mood/server/__main__.py:167
 msgid ""
 "\n"
 "Replaced the old monster\n"
@@ -65,40 +65,108 @@ msgstr ""
 "\n"
 "Произошла замена старого монстра\n"
 
-#: mood/server/__main__.py:184
-msgid "Moving monsters: on"
-msgstr "Блуждающие монстры: вкл"
+#: mood/server/__main__.py:175
+#, python-brace-format
+msgid "Player {} added monster {} with {} hitpoint to ({}, {}) saying {}\n"
+msgid_plural "Player {} added monster {} with {} hitpoints to ({}, {}) saying {}\n"
+msgstr[0] ""
+"Добавлен монстр {} (одно-едиственное очко здоровья) на ({}, {}), "
+"говорящий {}\n"
+msgstr[1] "Добавлен монстр {} ({} очка здоровья) на ({}, {}), говорящий {}\n"
+msgstr[2] "Добавлен монстр {} ({} очков здоровья) на ({}, {}), говорящий {}\n"
+msgstr[3] "Добавлен монстр {} ({} очко здоровья) на ({}, {}), говорящий {}\n"
 
-#: mood/server/__main__.py:187
-msgid "Moving monsters: off"
-msgstr "Блуждающие монстры: выкл"
+#: mood/server/__main__.py:185
+msgid "Moving monsters: on\n"
+msgstr "Блуждающие монстры: вкл\n"
 
-#: mood/server/__main__.py:196
+#: mood/server/__main__.py:188
+msgid "Moving monsters: off\n"
+msgstr "Блуждающие монстры: выкл\n"
+
+#: mood/server/__main__.py:197
 #, python-brace-format
 msgid "No {} here\n"
 msgstr "{} здесь нет\n"
 
-#: mood/server/__main__.py:210
+#: mood/server/__main__.py:203
+#, python-brace-format
+msgid "Attacked {} with {}, damage {} hitpoint\n"
+msgid_plural "Attacked {} with {}, damage {} hitpoints\n"
+msgstr[0] "Атака на {} с {}, урон всего одна единица здоровья\n"
+msgstr[1] "Атака на {} с {}, урон {} очка здоровья\n"
+msgstr[2] "Атака на {} с {}, урон {} очков здоровья\n"
+msgstr[3] "Атака на {} с {}, урон {} очко здоровья\n"
+
+#: mood/server/__main__.py:209
+#, python-brace-format
+msgid "{} now has {} hitpoint\n"
+msgid_plural "{} now has {} hitpoints\n"
+msgstr[0] "У {} осталось последнее очко здоровья\n"
+msgstr[1] "{} теперь имеет {} очка здоровья\n"
+msgstr[2] "{} теперь имеет {} очков здоровья\n"
+msgstr[3] "{} теперь имеет {} очко здоровья\n"
+
+#: mood/server/__main__.py:211
 #, python-brace-format
 msgid "{} died\n"
 msgstr "{} мёртв\n"
 
-#: mood/server/__main__.py:232
+#: mood/server/__main__.py:221
+#, fuzzy, python-brace-format
+msgid "Player {} attacked {} with {}, dealing {} point of damage.\n"
+msgid_plural "Player {} attacked {} with {}, dealing {} points of damage.\n"
+msgstr[0] "Игрок {} атаковал {} с {}, нанеся всего одно очко урона.\n"
+msgstr[1] "Игрок {} атаковал {} с {}, нанеся {} очка урона.\n"
+msgstr[2] "Игрок {} атаковал {} с {}, нанеся {} очков урона.\n"
+msgstr[3] "Игрок {} атаковал {} с {}, нанеся {} очко урона.\n"
+
+#: mood/server/__main__.py:223
+#, python-brace-format
+msgid "Now {} has {} hitpoint.\n"
+msgid_plural "Now {} has {} hitpoints.\n"
+msgstr[0] "Теперь {} имеет всего одно очко здоровья.\n"
+msgstr[1] "Теперь {} имеет {} очка здоровья\n"
+msgstr[2] "Теперь {} имеет {} очков здоровья\n"
+msgstr[3] "Теперь {} имеет {} очко здоровья\n"
+
+#: mood/server/__main__.py:228
+#, python-brace-format
+msgid ""
+"Player {} attacked {} with {}, dealing fatal {} point of damage. {} is "
+"dead now.\n"
+msgid_plural ""
+"Player {} attacked {} with {}, dealing fatal {} points of damage. {} is "
+"dead now.\n"
+msgstr[0] ""
+"Игрок {} атаковал {} с {}, нанося фатальное одно-едиственное очка урона. "
+"{} теперь мёртв.\n"
+msgstr[1] ""
+"Игрок {} атаковал {} с {}, нанося фатальные {} очка урона. {} теперь "
+"мёртв.\n"
+msgstr[2] ""
+"Игрок {} атаковал {} с {}, нанося фатальные {} очков урона. {} теперь "
+"мёртв.\n"
+msgstr[3] ""
+"Игрок {} атаковал {} с {}, нанося фатальное {} очко урона. {} теперь "
+"мёртв.\n"
+
+#: mood/server/__main__.py:233
 #, python-brace-format
 msgid "Goodbye, {}! See you later in fields of MUD!\n"
 msgstr "Пока, {}! Увидимся позже на просторах MUD!\n"
 
-#: mood/server/__main__.py:236
+#: mood/server/__main__.py:237
 #, python-brace-format
 msgid "User {} leave the dungeon...\n"
 msgstr "Пользователь {} покинул подземелье...\n"
 
-#: mood/server/__main__.py:246
+#: mood/server/__main__.py:247
 #, python-brace-format
 msgid "{} moved one cell {}\n"
 msgstr "{} переместился на одну клетку {}\n"
 
-#: mood/server/__main__.py:262
+#: mood/server/__main__.py:263
 msgid ""
 "Commands:\n"
 "                            help - you're here\n"
@@ -114,19 +182,17 @@ msgstr ""
 "Команды:\n"
 "                        help — вы здесь\n"
 "                        up \\ down \\ left \\ right — движения по данжу\n"
-"                        attack <name> [with <weapon>] — атаковать монстра\n"
+"                        attack <name> [with <weapon>] — атаковать монстра"
+"\n"
 "                        addmon — добавить монстра\n"
 "sayall — <строка> (либо одно слово, либо строка в кавычках)\n"
 "                        quit — выбраться из подземелья\n"
 
-#: mood/server/__main__.py:273
+#: mood/server/__main__.py:274
 msgid ""
 "Unknown command.                                Enter 'help' for command "
 "list.\n"
 msgstr ""
 "Неизвестная команда.                                Введите 'help' для "
 "списка команд.\n"
-
-#~ msgid "{} now has {}\n"
-#~ msgstr "{} теперь имеет {}\n"
 
