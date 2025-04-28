@@ -8,10 +8,12 @@ DOCLIST = 'docs.list'
 
 def task_docs():
     """Build documentation"""
-    return {
-        'file_dep': [*Path(".").glob("*.py"), *Path(".").glob("*.rst")],
-        'actions': ['sphinx-build -M html source _build']
-    }
+    for form in ['rst', 'txt']:
+        yield {
+            'name': form,
+            'file_dep': [*Path(".").glob("*.py"), *Path(".").glob(f"*.{form}")],
+            'actions': ['sphinx-build -M html source _build']
+        }
 
 def task_erase():
     """Erase generates and new files"""
@@ -26,6 +28,7 @@ def task_zip():
     }
 
 def zipper(outfile, infile):
+    """convert zip names to .list"""
     with ZipFile(outfile) as outzip:
         names = outzip.namelist()
     with open(infile, "w") as inzip:
