@@ -1,0 +1,7 @@
+__py*
+Pipfile.lock
+.*swp
+.coverage
+_build
+htmlcov
+.doit.db
