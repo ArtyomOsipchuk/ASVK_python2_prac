@@ -1,4 +1,4 @@
-pathlib import Path
+from pathlib import Path
 
 
 def task_docs():
