@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+'''
+'''
+from ..server.__main__ import start_server
+import multiprocessing
+import asyncio
+import unittest
+import socket
+import os
+import sys
+import threading
+import time
+
+def setup():
+    """Set up server, connect to socket and login"""
+    proc = multiprocessing.Process(target=start_server)
+    proc.start()
+    time.sleep(1)
+
+    # подключаем сокет
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('localhost', 1337))
+    msg = f"TESTER\n"
+    s.sendall(bytes(msg.encode()))
+    ans = s.recv(4096).rstrip().decode()
+
+    # без остановки монстров тестирования не случится
+    msg = f"movemonsters off\n"
+    s.sendall(bytes(msg.encode()))
+    ans = s.recv(4096).rstrip().decode()
+ 
+    return proc, s
+
+def terminate(proc):
+    """Shut down socket and server"""
+    proc.terminate()
+
+
+def testing(s, arg):
+    """Test answers from server.""" 
+    msg = f"{arg}\n"
+    s.sendall(bytes(msg.encode()))
+    ans = s.recv(1024).rstrip().decode()
+    return ans
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testfile("servertest.rst")

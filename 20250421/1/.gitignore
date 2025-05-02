@@ -1,0 +1,8 @@
+__py*
+Pipfile.lock
+.*swp
+.coverage
+_build
+htmlcov
+Moo.png
+.doit.db
