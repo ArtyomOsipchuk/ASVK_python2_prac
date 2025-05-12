@@ -6,6 +6,11 @@ DOIT_CONFIG = {'default_tasks': ['docs']}
 DOCZIP = 'docs.zip'
 DOCLIST = 'docs.list'
 
+def task_wheel():
+    return {
+        'actions': ['python3 -m build --wheel'],
+    }
+
 def task_sdist():
     return {
         'actions': ['python3 -m build --sdist'],

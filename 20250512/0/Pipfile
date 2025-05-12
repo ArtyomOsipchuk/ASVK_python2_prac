@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 python-cowsay = "*"
+packaging = "*"
 
 [dev-packages]
 sphinx = "*"
@@ -15,6 +16,7 @@ docutils = "*"
 coverage = "*"
 setuptools = "*"
 build = "*"
+packaging = "*"
 
 [requires]
 python_version = "3.12"

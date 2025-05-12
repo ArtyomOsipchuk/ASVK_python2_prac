@@ -1,8 +1,12 @@
 [project]
 name="MUD"
 description="Multi User Dungeon"
-version="1.0"
+dynamic=["version"]
 readme="README.md"
+license = {text = "MIT-0"}
+authors = [
+ {name = "Artyom Osipchuk (aka artos)", email = "artos4002@yandex.ru"}
+]
 
 [build-system]
 requires = ["setuptools"]
