@@ -3,17 +3,21 @@ name="MUD"
 description="Multi User Dungeon"
 dynamic=["version"]
 readme="README.md"
-license = {text = "MIT-0"}
+license = "MIT"
 authors = [
  {name = "Artyom Osipchuk (aka artos)", email = "artos4002@yandex.ru"}
 ]
+scripts = {mud = "MUD:mud"}
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-dir]
-Appbase="mood"
+MUD="mood"
 
 [tool.setuptools.package-data]
-AppBase=["locales/*/*/*.mo"]
+MUD=["locales/*/*/*.mo"]
+
+#[dependencies]
+#["python-cowsay"]

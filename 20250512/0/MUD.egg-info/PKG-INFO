@@ -3,7 +3,6 @@ Name: MUD
 Version: 0.0.0
 Summary: Multi User Dungeon
 Author-email: "Artyom Osipchuk (aka artos)" <artos4002@yandex.ru>
-License: MIT-0
 Description-Content-Type: text/markdown
 License-File: COPYING
 Dynamic: license-file
