@@ -1,0 +1,8 @@
+recursive-include mood *
+recursive-include po *.po
+recursive-include tests *
+recursive-include docs *
+include *.png
+include *.jpg
+include *.jpeg
+include *.md
