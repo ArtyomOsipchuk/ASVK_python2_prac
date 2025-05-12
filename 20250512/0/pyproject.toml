@@ -1,0 +1,15 @@
+[project]
+name="MUD"
+description="Multi User Dungeon"
+version="1.0"
+readme="README.md"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-dir]
+Appbase="mood"
+
+[tool.setuptools.package-data]
+AppBase=["locales/*/*/*.mo"]

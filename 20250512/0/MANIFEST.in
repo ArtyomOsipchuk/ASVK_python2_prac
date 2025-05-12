@@ -1,8 +1,6 @@
-recursive-include mood *
-recursive-include po *.po
-recursive-include tests *
-recursive-include docs *
-include *.png
-include *.jpg
-include *.jpeg
+recursive-include mood *.py
+recursive-include mood *.po
+recursive-include mood *.rst
+include source/_static/*.png
+include source/_static/*.jpeg
 include *.md
