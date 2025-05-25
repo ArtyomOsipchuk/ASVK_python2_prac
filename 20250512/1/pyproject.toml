@@ -3,6 +3,9 @@ name="MUD"
 description="M(oo)lti User Dungeon"
 dynamic=["version"]
 readme="README.md"
+dependencies = [
+	"python-cowsay",
+]
 license = "MIT"
 authors = [
  {name = "Artyom Osipchuk", email = "artos4002@yandex.ru"}
@@ -28,10 +31,4 @@ MUD=["locales/*/*/*.mo",
 "custom_monsters/*.txt",
 "docs/html/*.html",
 "docs/html/**/*",
-]
-
-dependencies = [
-	"python-cowsay",
-	"webbrowser",
-	"gettext"
 ]
