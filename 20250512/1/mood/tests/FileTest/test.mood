@@ -1,0 +1,8 @@
+addmon turtle hp 21 hello 't-t-t-turtle' coords 0 1
+up
+attack dragon
+attack turtle with
+attack turtle with axe
+attack turtle
+sayall 'я великий победитель черепахи!'
+quit
