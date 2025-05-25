@@ -1,0 +1,36 @@
+[project]
+name="MUD"
+description="Multi User Dungeon"
+dynamic=["version"]
+readme="README.md"
+license = "MIT"
+authors = [
+ {name = "Artyom Osipchuk", email = "artos4002@yandex.ru"}
+]
+
+[project.scripts]
+mudclient = 'MUD.client'
+mudserver = 'MUD.server'
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-dir]
+MUD="mood"
+
+[tool.setuptools.package-data]
+MUD=["locales/*/*/*.mo",
+"locales/*/*/*.po",
+"client/*.py",
+"server/*.py",
+"tests/*",
+"custom_monsters/*.txt",
+"docs/*",
+]
+
+dependencies = [
+	"python-cowsay",
+	"webbrowser",
+	"gettext"
+]
