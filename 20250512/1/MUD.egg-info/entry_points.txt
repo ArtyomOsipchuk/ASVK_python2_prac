@@ -1,3 +1,0 @@
-[console_scripts]
-mudclient = MUD.client:run
-mudserver = MUD.server:run
