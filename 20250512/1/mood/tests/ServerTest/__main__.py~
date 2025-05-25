@@ -22,12 +22,12 @@ def setup():
     s.connect(("localhost", 1337))
     msg = "TESTER\n"
     s.sendall(bytes(msg.encode()))
-    s.recv(4096).rstrip().decode()
+    ans = s.recv(4096).rstrip().decode()
 
     # без остановки монстров тестирования не случится
     msg = "movemonsters off\n"
     s.sendall(bytes(msg.encode()))
-    s.recv(4096).rstrip().decode()
+    ans = s.recv(4096).rstrip().decode()
 
     return proc, s
 

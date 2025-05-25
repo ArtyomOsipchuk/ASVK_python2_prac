@@ -376,8 +376,6 @@ def start_server():
     sys.stderr = open(os.devnull, "w")
     asyncio.run(main())
 
-def run():
-    asyncio.run(main())
 
 if __name__ == "__main__":
-    run()
+    asyncio.run(main())

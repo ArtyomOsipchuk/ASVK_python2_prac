@@ -1,8 +1,9 @@
 Metadata-Version: 2.4
 Name: MUD
 Version: 0.0.0
-Summary: Multi User Dungeon
-Author-email: "Artyom Osipchuk (aka artos)" <artos4002@yandex.ru>
+Summary: M(oo)lti User Dungeon
+Author-email: Artyom Osipchuk <artos4002@yandex.ru>
+License-Expression: MIT
 Description-Content-Type: text/markdown
 License-File: COPYING
 Dynamic: license-file

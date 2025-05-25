@@ -45,18 +45,16 @@ class CowNetcat(cmd.Cmd):
 
     def do_documentation(self, arg):
         """Open documentation in browser."""
-        try:
-            docs_path = files("MUD.docs") / 'html' / "index.html"
-            webbrowser.open(f"file://{docs_path}")
-        except:    
-            doc_path = (
-                Path(__file__).parent.parent.parent
-                / "mood"
-                / "docs"
-                / "html"
-                / "index.html"
-            )
-            webbrowser.open(f"file://{doc_path.resolve()}")
+        docs_path = files("mood.docs") / 'html' / "index.html"
+        webbrowser.open(f"file://{docs_path}")
+        #doc_path = (
+        #    Path(__file__).parent.parent.parent
+        #    / "mood"
+        #    / "docs"
+        #    / "html"
+        #    / "index.html"
+        #)
+        #webbrowser.open(f"file://{doc_path.resolve()}")
 
     def do_locale(self, arg):
         """Set locale."""

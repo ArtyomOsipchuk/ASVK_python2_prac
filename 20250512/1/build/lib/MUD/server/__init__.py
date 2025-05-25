@@ -1,2 +1,3 @@
-from .__main__ import *
+"""Initialization file."""
 
+from .__main__ import *

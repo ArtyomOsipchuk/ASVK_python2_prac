@@ -1,6 +1,6 @@
 [project]
 name="MUD"
-description="M(oo)lti User Dungeon"
+description="Multi User Dungeon"
 dynamic=["version"]
 readme="README.md"
 license = "MIT"
