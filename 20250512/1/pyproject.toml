@@ -26,7 +26,8 @@ MUD=["locales/*/*/*.mo",
 "server/*.py",
 "tests/*",
 "custom_monsters/*.txt",
-"docs/*",
+"docs/html/*.html",
+"docs/html/**/*",
 ]
 
 dependencies = [
