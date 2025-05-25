@@ -6,6 +6,7 @@ Author-email: Artyom Osipchuk <artos4002@yandex.ru>
 License-Expression: MIT
 Description-Content-Type: text/markdown
 License-File: COPYING
+Requires-Dist: python-cowsay
 Dynamic: license-file
 
 # MUD

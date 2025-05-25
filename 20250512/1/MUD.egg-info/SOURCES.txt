@@ -6,6 +6,7 @@ MUD.egg-info/PKG-INFO
 MUD.egg-info/SOURCES.txt
 MUD.egg-info/dependency_links.txt
 MUD.egg-info/entry_points.txt
+MUD.egg-info/requires.txt
 MUD.egg-info/top_level.txt
 mood/client/__common__.py
 mood/client/__init__.py
@@ -45,5 +46,3 @@ mood/server/__main__.py
 mood/tests/ClientTest/__main__.py
 mood/tests/ServerTest/__main__.py
 mood/tests/ServerTest/servertest.rst
-source/_static/python.png
-source/_static/wallcows.jpeg

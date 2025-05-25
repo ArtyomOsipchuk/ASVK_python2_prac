@@ -148,6 +148,8 @@ class CowNetcat(cmd.Cmd):
             damage = 15
         elif ww == "axe":
             damage = 20
+        elif ww == "sword":
+            damage = 10
         msg = f"attack {name} {damage} {ww}\n"
         self.s.sendall(bytes(msg.encode()))
 
@@ -202,7 +204,7 @@ class CowNetcat(cmd.Cmd):
         """Attack func completion."""
         words = (line[:endidx] + ".").split()
         DICT = []
-        cows = ["jgsbat"] + cowsay.list_cows()
+        cows = ["jgsbat", "gamer"] + cowsay.list_cows()
         weapons = ["sword", "spear", "axe"]
         if len(words) == 2 and words[-1][:-1] in cows:
             return [cows[(cows.index(words[-1][:-1]) + 1) % len(cows)]]

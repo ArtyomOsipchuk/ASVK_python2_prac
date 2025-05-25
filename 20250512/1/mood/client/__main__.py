@@ -148,6 +148,8 @@ class CowNetcat(cmd.Cmd):
             damage = 15
         elif ww == "axe":
             damage = 20
+        elif ww == "sword":
+            damage = 10
         msg = f"attack {name} {damage} {ww}\n"
         self.s.sendall(bytes(msg.encode()))
 

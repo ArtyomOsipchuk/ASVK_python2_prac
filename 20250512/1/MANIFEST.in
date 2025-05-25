@@ -5,6 +5,4 @@ recursive-include mood *.rst
 recursive-include mood *.txt
 recursive-include mood *.html
 recursive-include mood/docs/html *
-include source/_static/*.png
-include source/_static/*.jpeg
 include *.md
